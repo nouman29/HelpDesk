@@ -1,0 +1,78 @@
+/**
+ * Tiny typed fetch wrapper for the AI HelpDesk backend.
+ *
+ * Responsibilities:
+ *  - Resolve the base URL from VITE_API_BASE_URL.
+ *  - Send JSON Content-Type by default.
+ *  - Parse the standard `{ status, message, data }` envelope.
+ *  - Throw an Error when status === "ERROR" (or HTTP is not OK), with the
+ *    backend's `message` so the UI can surface it to the user.
+ */
+
+export const API_BASE_URL: string =
+  (import.meta.env?.VITE_API_BASE_URL as string | undefined) ?? 'http://localhost:5000';
+
+export interface ApiEnvelope<T> {
+  status: 'OK' | 'ERROR' | string;
+  message: string;
+  data: T;
+}
+
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status = 0) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  body?: unknown;
+  signal?: AbortSignal;
+  headers?: Record<string, string>;
+  /**
+   * Per-call override for the base URL. Pass an empty string ('') to make a
+   * relative request that goes through the Vite dev proxy (used by signup
+   * to avoid CORS in dev). When omitted, falls back to API_BASE_URL.
+   */
+  baseUrl?: string;
+}
+
+export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { method = 'GET', body, signal, headers, baseUrl } = options;
+  const base = baseUrl ?? API_BASE_URL;
+
+  let response: Response;
+  try {
+    response = await fetch(`${base}${path}`, {
+      method,
+      signal,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ...headers,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Network request failed';
+    throw new ApiError(`Cannot reach server: ${msg}`);
+  }
+
+  let json: Partial<ApiEnvelope<T>> | null = null;
+  try {
+    json = (await response.json()) as Partial<ApiEnvelope<T>>;
+  } catch {
+    // ignore — handled below
+  }
+
+  if (!response.ok) {
+    throw new ApiError(json?.message || `Request failed (${response.status})`, response.status);
+  }
+  if (json?.status === 'ERROR') {
+    throw new ApiError(json.message || 'Server returned an error', response.status);
+  }
+  return (json?.data as T) ?? (undefined as unknown as T);
+}
