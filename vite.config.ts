@@ -11,19 +11,6 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // Dev-only proxy: the FastAPI backend on :5000 does not return CORS
-  // headers. Routing /register through Vite makes the signup request
-  // same-origin from the browser's perspective and sidesteps the
-  // preflight rejection without touching the server.
-  server: {
-    proxy: {
-      '/register': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
   build: {
     chunkSizeWarningLimit: 1024,
     rolldownOptions: {

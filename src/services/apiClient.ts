@@ -32,21 +32,14 @@ interface RequestOptions {
   body?: unknown;
   signal?: AbortSignal;
   headers?: Record<string, string>;
-  /**
-   * Per-call override for the base URL. Pass an empty string ('') to make a
-   * relative request that goes through the Vite dev proxy (used by signup
-   * to avoid CORS in dev). When omitted, falls back to API_BASE_URL.
-   */
-  baseUrl?: string;
 }
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, signal, headers, baseUrl } = options;
-  const base = baseUrl ?? API_BASE_URL;
+  const { method = 'GET', body, signal, headers } = options;
 
   let response: Response;
   try {
-    response = await fetch(`${base}${path}`, {
+    response = await fetch(`${API_BASE_URL}${path}`, {
       method,
       signal,
       headers: {
