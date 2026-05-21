@@ -8,6 +8,7 @@ import { HeroBackground } from "@/components/three/HeroBackground";
 import { AuroraBlob } from "@/components/animations/AuroraBlob";
 import { ROUTES } from "@/constants/routes";
 import { fadeUp, blurUp, stagger } from "@/utils/motion";
+import { isAuthenticated } from "@/features/auth/authStorage";
 
 export function HeroSection() {
   const navigate = useNavigate();
@@ -68,7 +69,9 @@ export function HeroSection() {
               <Button
                 size="lg"
                 rightIcon={<FiArrowRight />}
-                onClick={() => navigate(ROUTES.CHAT)}
+                onClick={() =>
+                  navigate(isAuthenticated() ? ROUTES.CHAT : ROUTES.LOGIN)
+                }
               >
                 Start AI Conversation
               </Button>

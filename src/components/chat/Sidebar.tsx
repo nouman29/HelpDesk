@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  FiPlus, FiClock, FiSettings, FiUser, FiLogOut,
+  FiPlus, FiClock, FiLogOut,
 } from 'react-icons/fi';
 import { Logo } from '@/components/ui/Logo';
 import { ROUTES } from '@/constants/routes';
@@ -22,9 +22,6 @@ interface Props {
 }
 
 const RECENT_LIMIT = 6;
-
-// Dummy relative timestamps — kept until the backend includes one in /my-chats.
-const DUMMY_RELATIVE_TIMES = ['2m ago', '14m ago', '1h ago', '3h ago', '1d ago', '4d ago'];
 
 interface CircularProgressProps {
   value: number; // 0–100
@@ -207,7 +204,7 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
         ) : recent.length === 0 ? (
           <div className="px-3 py-4 text-xs text-tertiary">No recent chats yet</div>
         ) : (
-          recent.map((c, i) => {
+          recent.map((c) => {
             const pct = Math.max(0, Math.min(100, Math.round(c.completion_percentage)));
             const isActive = highlightedId === c.chat_id;
             return (
@@ -227,8 +224,7 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
                     {c.chat_name}
                   </p>
                   <p className="mono text-[10px] uppercase tracking-[0.18em] text-tertiary mt-0.5">
-                    {/* TODO: replace with real timestamp from backend when available */}
-                    {DUMMY_RELATIVE_TIMES[i % DUMMY_RELATIVE_TIMES.length]}
+                    {c.total_answered_questions}/{c.total_questions} answered
                   </p>
                 </div>
                 <CircularProgress value={pct} active={isActive} />
@@ -239,7 +235,6 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
       </nav>
 
       <div className="border-t border-white/5 pt-3 flex flex-col gap-1">
-        <SidebarItem icon={<FiSettings />} label="Settings" />
         <SidebarItem
           icon={<FiLogOut />}
           label="Logout"
@@ -248,15 +243,6 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
             navigate(ROUTES.LOGIN);
           }}
         />
-
-        <button className="mt-2 flex items-center gap-3 rounded-xl glass border border-white/10 px-3 py-2.5">
-          <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#1f86ff] to-[#8b6cff] text-white">
-            <FiUser size={14} />
-          </div>
-          <div className="text-left">
-            <p className="text-[13px] font-medium text-primary">Person</p>
-          </div>
-        </button>
       </div>
     </motion.aside>
   );

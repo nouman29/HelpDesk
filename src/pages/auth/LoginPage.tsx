@@ -63,7 +63,6 @@ export default function LoginPage() {
                 <input type="checkbox" defaultChecked className="accent-[var(--brand-500)]" />
                 Remember me
               </label>
-              <a href="#forgot" className="link-anim text-[var(--brand-300)]">Forgot password?</a>
             </div>
 
             {error && (

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { MagneticButton } from '@/components/animations/MagneticButton';
 import { AuroraBlob } from '@/components/animations/AuroraBlob';
 import { ROUTES } from '@/constants/routes';
+import { isAuthenticated } from '@/features/auth/authStorage';
 
 export function CTASection() {
   const navigate = useNavigate();
@@ -36,15 +37,23 @@ export function CTASection() {
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <MagneticButton>
-              <Button size="lg" rightIcon={<FiArrowRight />} onClick={() => navigate(ROUTES.CHAT)}>
+              <Button
+                size="lg"
+                rightIcon={<FiArrowRight />}
+                onClick={() =>
+                  navigate(isAuthenticated() ? ROUTES.CHAT : ROUTES.LOGIN)
+                }
+              >
                 Open AI HelpDesk
               </Button>
             </MagneticButton>
-            <MagneticButton>
-              <Button size="lg" variant="glass" onClick={() => navigate(ROUTES.SIGNUP)}>
-                Create an account
-              </Button>
-            </MagneticButton>
+            {!isAuthenticated() && (
+              <MagneticButton>
+                <Button size="lg" variant="glass" onClick={() => navigate(ROUTES.SIGNUP)}>
+                  Create an account
+                </Button>
+              </MagneticButton>
+            )}
           </div>
         </motion.div>
       </div>

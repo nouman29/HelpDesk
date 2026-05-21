@@ -6,18 +6,22 @@ import { ChatHeader } from '@/components/chat/ChatHeader';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { ChatInput } from '@/components/chat/ChatInput';
 import { AnswerOptions } from '@/components/chat/AnswerOptions';
+import { ConclusionsView } from '@/components/chat/ConclusionsView';
 import type { ChatMessage } from '@/types';
 import { DECISION_JOURNEY } from '@/data/journeys';
 import { pageTransition } from '@/utils/motion';
+import { CONCLUSION_THRESHOLD } from '@/constants/chat';
 import {
   getInitialQuestions,
   startChat as apiStartChat,
   sendAnswer as apiSendAnswer,
+  concludeChat as apiConcludeChat,
   getChat as apiGetChat,
   type InitialQuestion,
   type AnswerPayload,
   type ChatQuestionResponse,
   type GetChatResponse,
+  type Conclusion,
 } from '@/services/healthService';
 import {
   getToken,
@@ -39,7 +43,8 @@ type Phase =
   | 'asking-initial'     // walking through GET /get_initial_questions
   | 'starting-chat'      // calling /start-chat
   | 'in-chat'            // exchanging Q/A with the AI
-  | 'complete'           // 100% complete
+  | 'concluding'         // calling /conclude-chat
+  | 'complete'           // chat is concluded — show ConclusionsView
   | 'error';
 
 export default function ChatPage() {
@@ -59,6 +64,7 @@ export default function ChatPage() {
     answered: number;
     percentage: number;
   } | null>(null);
+  const [conclusions, setConclusions] = useState<Conclusion[]>([]);
   const [errorText, setErrorText] = useState<string | null>(null);
 
   /* ----------------------- Helpers ----------------------- */
@@ -121,12 +127,15 @@ export default function ChatPage() {
   };
 
   /**
-   * Best-effort restore from /get-chat. The endpoint returns a history of
-   * answered questions but does NOT return the next pending question, so the
-   * safest behavior is: rehydrate the visible history, then surface a small
-   * system note inviting the user to continue. If the chat is complete we
-   * mark it complete. If the shape is unexpected we fail gracefully and the
-   * caller falls back to a fresh flow.
+   * Best-effort restore from /get-chat.
+   *
+   *  - Rehydrates the visible Q/A history.
+   *  - If the chat already carries `chat_conclusions`, jumps straight to the
+   *    `complete` phase and shows the conclusions list.
+   *  - Otherwise, points `currentQuestionId` at the first UNANSWERED question
+   *    (the next one the user needs to answer) and resumes `in-chat`.
+   *  - If the shape is unexpected we fail gracefully and the caller falls
+   *    back to a fresh flow.
    */
   const tryRestoreFromGetChat = (
     resp: GetChatResponse,
@@ -164,19 +173,29 @@ export default function ChatPage() {
       percentage: chatMeta.completion_percentage,
     });
 
-    if (chatMeta.completion_percentage >= 100) {
+    // If the server already produced conclusions, treat the chat as complete.
+    const restoredConclusions = Array.isArray(resp.chat_conclusions)
+      ? resp.chat_conclusions
+      : [];
+    if (restoredConclusions.length > 0 || chatMeta.completion_percentage >= 100) {
+      setConclusions(restoredConclusions);
       setPhase('complete');
+      // No further user action — clear the active id so the next session
+      // doesn't try to restore a finished chat.
+      removeActiveChatId();
       return true;
     }
 
-    // We can't know what the NEXT question is from /get-chat alone (no field
-    // for it in the documented response). Surface a friendly system note;
-    // the next /send-answer call uses the last answered question id.
-    const lastAnswered = [...items].reverse().find((i) => i.selected_answer);
-    if (!lastAnswered) {
+    // Otherwise, find the FIRST unanswered question (this is the one the
+    // user must answer next). Per the spec: "if the chat is not concluded
+    // so there must be the last question must be not answered yet."
+    const pending = items.find((i) => !i.selected_answer);
+    if (!pending) {
+      // Every question is answered but completion < 100% and no conclusions
+      // — shape unexpected, fall back to a fresh flow.
       return false;
     }
-    setCurrentQuestionId(lastAnswered.question_id);
+    setCurrentQuestionId(pending.question_id);
     setMessages((m) => [
       ...m,
       {
@@ -255,7 +274,13 @@ export default function ChatPage() {
   const submitAnswer = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
-    if (phase === 'complete' || phase === 'bootstrapping' || phase === 'starting-chat') return;
+    if (
+      phase === 'complete' ||
+      phase === 'bootstrapping' ||
+      phase === 'starting-chat' ||
+      phase === 'concluding'
+    )
+      return;
     if (currentQuestionId == null) return;
 
     pushUser(trimmed);
@@ -287,30 +312,49 @@ export default function ChatPage() {
           if (resp.question && resp.question_id != null) {
             pushAIQuestion(resp.question, resp.possible_answers ?? [], resp.question_id);
           }
-          setPhase(resp.completion_percentage >= 100 ? 'complete' : 'in-chat');
+          setPhase('in-chat');
         }
       } else if (phase === 'in-chat') {
         const token = getToken();
         if (!token) throw new Error('You are not logged in.');
         if (chatId == null) throw new Error('Missing chat id.');
-        const resp = await apiSendAnswer(token, chatId, {
-          id: currentQuestionId,
-          answer: trimmed,
-        });
-        applyServerProgress(resp);
-        if (resp.question && resp.question_id != null) {
-          pushAIQuestion(resp.question, resp.possible_answers ?? [], resp.question_id);
-        }
-        if (resp.completion_percentage >= 100) {
+
+        // Decide which endpoint to call based on the LAST server-reported
+        // completion percentage. Per spec: once it crosses the threshold
+        // (e.g. > 90%), the next user submission goes to /conclude-chat
+        // rather than /send-answer.
+        const currentPct = progress?.percentage ?? 0;
+        const answer: AnswerPayload = { id: currentQuestionId, answer: trimmed };
+
+        if (currentPct > CONCLUSION_THRESHOLD) {
+          setPhase('concluding');
+          const result = await apiConcludeChat(token, chatId, answer);
+          setConclusions(Array.isArray(result) ? result : []);
+          setProgress((p) =>
+            p ? { ...p, answered: p.answered + 1, percentage: 100 } : p,
+          );
           setPhase('complete');
           removeActiveChatId();
+        } else {
+          const resp = await apiSendAnswer(token, chatId, answer);
+          applyServerProgress(resp);
+          if (resp.question && resp.question_id != null) {
+            pushAIQuestion(resp.question, resp.possible_answers ?? [], resp.question_id);
+          }
+          // Safety net: if the backend itself reports 100% we still
+          // wrap up gracefully even though we expected to conclude
+          // via the threshold branch above.
+          if (resp.completion_percentage >= 100) {
+            setPhase('complete');
+            removeActiveChatId();
+          }
         }
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong.';
       pushError(msg);
-      // Only force the 'error' phase if we're not already mid-flow; otherwise
-      // let the user retry by clicking another option or typing.
+      // If we failed mid-conclude, drop back to in-chat so the user can retry.
+      setPhase((p) => (p === 'concluding' ? 'in-chat' : p));
     } finally {
       setThinking(false);
     }
@@ -320,7 +364,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [messages, thinking]);
+  }, [messages, thinking, conclusions]);
 
   /* ----------------------- New journey ----------------------- */
 
@@ -330,6 +374,7 @@ export default function ChatPage() {
     setChatId(null);
     setCurrentQuestionId(null);
     setProgress(null);
+    setConclusions([]);
     setErrorText(null);
     setCollectedInitial([]);
     setInitialIndex(0);
@@ -369,14 +414,22 @@ export default function ChatPage() {
   const headerTitle =
     phase === 'complete'
       ? 'Decision Journey · complete'
-      : isEmpty
-        ? 'New Decision Journey'
-        : 'Decision Journey · in progress';
+      : phase === 'concluding'
+        ? 'Decision Journey · concluding'
+        : isEmpty
+          ? 'New Decision Journey'
+          : 'Decision Journey · in progress';
 
   const totalSteps = progress?.total ?? DECISION_JOURNEY.length;
   const step = progress
     ? Math.max(1, Math.min(progress.answered + (phase === 'complete' ? 0 : 1), totalSteps))
     : 1;
+
+  const inputDisabled =
+    phase === 'complete' ||
+    phase === 'bootstrapping' ||
+    phase === 'starting-chat' ||
+    phase === 'concluding';
 
   return (
     <motion.div variants={pageTransition} initial="initial" animate="enter" exit="exit">
@@ -428,7 +481,7 @@ export default function ChatPage() {
                 ))}
 
                 {/* Options for the latest unanswered AI question */}
-                {latestOptionsMessageId && !thinking && phase !== 'complete' && (
+                {latestOptionsMessageId && !thinking && phase !== 'complete' && phase !== 'concluding' && (
                   <div className="pl-11 -mt-1 relative">
                     {/* Vertical connector: aligned with the AI avatar's
                         center (16px), gradient that fades from brand blue
@@ -458,13 +511,10 @@ export default function ChatPage() {
                 )}
 
                 {phase === 'complete' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="self-center mono text-[10px] uppercase tracking-[0.3em] text-[var(--brand-300)] py-3"
-                  >
-                    — assessment complete —
-                  </motion.div>
+                  <ConclusionsView
+                    conclusions={conclusions}
+                    onStartAnother={startNew}
+                  />
                 )}
               </div>
             </div>
@@ -473,7 +523,7 @@ export default function ChatPage() {
               <ChatInput
                 onSend={submitAnswer}
                 thinking={thinking}
-                disabled={phase === 'complete' || phase === 'bootstrapping' || phase === 'starting-chat'}
+                disabled={inputDisabled}
               />
               {errorText && (
                 <p className="mt-2 text-center text-[11px] text-[var(--accent-rose)]">

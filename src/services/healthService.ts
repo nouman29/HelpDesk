@@ -32,6 +32,17 @@ export type MyChat = {
   completion_percentage: number;
 };
 
+export interface Conclusion {
+  id: number;
+  chat_id: number;
+  title: string;
+  description: string;
+  probability_percentage: number;
+  accuracy_percentage: number;
+  cdate?: string;
+  udate?: string;
+}
+
 export interface GetChatResponse {
   chat: {
     id: number;
@@ -47,6 +58,8 @@ export interface GetChatResponse {
     selected_answer: string | null;
     possible_answers: string[];
   }>;
+  /** Present once the chat has been concluded. */
+  chat_conclusions?: Conclusion[];
 }
 
 /* --------------------- Endpoints --------------------- */
@@ -68,6 +81,22 @@ export function sendAnswer(
   answer: AnswerPayload,
 ): Promise<ChatQuestionResponse> {
   return apiRequest<ChatQuestionResponse>('/send-answer', {
+    method: 'POST',
+    body: { token, chat_id: chatId, answers: answer },
+  });
+}
+
+/**
+ * Conclude the chat once the completion percentage has crossed the
+ * configured threshold. The response is the final list of conclusions
+ * (diagnoses, recommendations, etc.) returned by the backend.
+ */
+export function concludeChat(
+  token: string,
+  chatId: number,
+  answer: AnswerPayload,
+): Promise<Conclusion[]> {
+  return apiRequest<Conclusion[]>('/conclude-chat', {
     method: 'POST',
     body: { token, chat_id: chatId, answers: answer },
   });

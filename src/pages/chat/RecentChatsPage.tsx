@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiArrowUpRight, FiClock } from 'react-icons/fi';
+import { FiSearch, FiArrowUpRight, FiClock, FiPlus } from 'react-icons/fi';
 import { BareLayout } from '@/app/layouts/BareLayout';
 import { Sidebar } from '@/components/chat/Sidebar';
 import { Input } from '@/components/ui/Input';
@@ -136,10 +136,27 @@ export default function RecentChatsPage() {
                   <p className="mt-1 text-xs text-tertiary">{error}</p>
                 </div>
               ) : filtered.length === 0 ? (
-                <div className="rounded-2xl glass border border-white/10 py-20 text-center text-tertiary">
-                  {chats.length === 0
-                    ? 'No chats found yet.'
-                    : `No chats match “${query}”.`}
+                <div className="rounded-2xl glass border border-white/10 py-16 px-6 text-center">
+                  {chats.length === 0 ? (
+                    <div className="flex flex-col items-center gap-5">
+                      <p className="text-base text-secondary">
+                        You don’t have any decision journeys yet.
+                      </p>
+                      <p className="text-sm text-tertiary max-w-md">
+                        Start your first guided journey — we’ll ask a few
+                        questions and walk you through to a clear conclusion.
+                      </p>
+                      <button
+                        onClick={() => navigate(ROUTES.CHAT)}
+                        className="group inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-[#1f86ff] to-[#8b6cff] shadow-[0_10px_30px_-10px_rgba(31,134,255,0.6)] btn-glow"
+                      >
+                        <FiPlus />
+                        <span>Start the chat</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-tertiary">No chats match “{query}”.</p>
+                  )}
                 </div>
               ) : (
                 <section className="flex flex-col gap-3">
