@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiArrowUpRight, FiMenu, FiX } from 'react-icons/fi';
+import { FiLogOut, FiMenu, FiX } from 'react-icons/fi';
 import { ROUTES } from '@/constants/routes';
 import { PRIMARY_NAV, isRouteHref } from '@/constants/nav';
 import { ThemeToggle } from '@/features/theme/ThemeToggle';
@@ -9,12 +9,14 @@ import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { lenisScrollTo } from '@/hooks/useLenis';
 import { cn } from '@/utils/cn';
+import { clearAuth, isAuthenticated } from '@/features/auth/authStorage';
 
 interface Props { transparent?: boolean; }
 
 export function Navbar({ transparent = true }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [authed, setAuthed] = useState<boolean>(() => isAuthenticated());
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,6 +26,25 @@ export function Navbar({ transparent = true }: Props) {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Re-check auth on every route change (covers login/signup/logout flows)
+  // and on cross-tab storage changes.
+  useEffect(() => {
+    setAuthed(isAuthenticated());
+  }, [location.pathname]);
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'hd:auth_token' || e.key === null) setAuthed(isAuthenticated());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  const handleLogout = () => {
+    clearAuth();
+    setAuthed(false);
+    navigate(ROUTES.LOGIN);
+  };
 
   /** Route OR anchor — routed through Lenis so the page doesn't freeze. */
   const handleNavClick = (e: React.MouseEvent, href: string) => {
@@ -87,22 +108,26 @@ export function Navbar({ transparent = true }: Props) {
 
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle className="hidden sm:inline-flex" />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(ROUTES.LOGIN)}
-              className="hidden sm:inline-flex"
-            >
-              Sign in
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              rightIcon={<FiArrowUpRight />}
-              onClick={() => navigate(ROUTES.CHAT)}
-            >
-              Start Journey
-            </Button>
+            {authed ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<FiLogOut />}
+                onClick={handleLogout}
+                className="hidden sm:inline-flex"
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(ROUTES.LOGIN)}
+                className="hidden sm:inline-flex"
+              >
+                Sign in
+              </Button>
+            )}
             <button
               type="button"
               aria-label="Menu"
@@ -136,15 +161,21 @@ export function Navbar({ transparent = true }: Props) {
                 </a>
               ))}
               <div className="my-2 h-px bg-white/10" />
-              <button
-                onClick={() => { setOpen(false); navigate(ROUTES.LOGIN); }}
-                className="rounded-lg px-3 py-2.5 text-sm text-secondary text-left hover:bg-white/5"
-              >
-                Sign in
-              </button>
-              <Button variant="primary" size="sm" onClick={() => { setOpen(false); navigate(ROUTES.CHAT); }} fullWidth>
-                Start Journey
-              </Button>
+              {authed ? (
+                <button
+                  onClick={() => { setOpen(false); handleLogout(); }}
+                  className="rounded-lg px-3 py-2.5 text-sm text-secondary text-left hover:bg-white/5 inline-flex items-center gap-2"
+                >
+                  <FiLogOut /> Logout
+                </button>
+              ) : (
+                <button
+                  onClick={() => { setOpen(false); navigate(ROUTES.LOGIN); }}
+                  className="rounded-lg px-3 py-2.5 text-sm text-secondary text-left hover:bg-white/5"
+                >
+                  Sign in
+                </button>
+              )}
             </nav>
           </motion.div>
         )}

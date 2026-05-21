@@ -53,7 +53,7 @@ export default function SignupPage() {
       });
       saveToken(token);
       setWiping(true);
-      window.setTimeout(() => navigate(ROUTES.CHAT), 900);
+      window.setTimeout(() => navigate(ROUTES.LANDING), 900);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not create account.';
       setError(msg);

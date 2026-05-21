@@ -24,6 +24,14 @@ export interface ChatQuestionResponse {
   question_id: number;
 }
 
+export type MyChat = {
+  chat_id: number;
+  chat_name: string;
+  total_questions: number;
+  total_answered_questions: number;
+  completion_percentage: number;
+};
+
 export interface GetChatResponse {
   chat: {
     id: number;
@@ -69,5 +77,12 @@ export function getChat(token: string, chatId: number): Promise<GetChatResponse>
   return apiRequest<GetChatResponse>('/get-chat', {
     method: 'POST',
     body: { token, chat_id: chatId },
+  });
+}
+
+export function getMyChats(token: string): Promise<MyChat[]> {
+  return apiRequest<MyChat[]>('/my-chats', {
+    method: 'POST',
+    body: { token },
   });
 }

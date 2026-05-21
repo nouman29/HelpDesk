@@ -38,7 +38,7 @@ export default function LoginPage() {
       const { token } = await loginUser({ email, password });
       saveToken(token);
       setWiping(true);
-      window.setTimeout(() => navigate(ROUTES.CHAT), 800);
+      window.setTimeout(() => navigate(ROUTES.LANDING), 800);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not sign in.';
       setError(msg);

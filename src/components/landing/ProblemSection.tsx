@@ -7,6 +7,7 @@ import { PROBLEM_POINTS } from '@/data/journeys';
 import { ROUTES } from '@/constants/routes';
 import { fadeUp, stagger } from '@/utils/motion';
 
+
 const FLOATING_PHRASES = [
   'tell me more', 'rephrase', 'sorry',
   'as an AI', 'maybe', "I don't know",
@@ -80,7 +81,6 @@ export function ProblemSection() {
               <span className="text-rose-300/80">no decision</span>
             </div>
           </div>
-
           {/* RIGHT — list */}
           <motion.ul
             variants={stagger(0.08, 0.1)}

@@ -1,5 +1,5 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react';
-import { FiArrowUp, FiPaperclip, FiMic } from 'react-icons/fi';
+import { FiArrowUp, FiPaperclip } from 'react-icons/fi';
 
 interface Props {
   onSend: (msg: string) => void;
@@ -43,9 +43,6 @@ export function ChatInput({ onSend, thinking, disabled }: Props) {
           placeholder="Write your own answer..."
           className="flex-1 max-h-40 resize-none bg-transparent text-[15px] text-primary placeholder:text-tertiary outline-none py-2 scroll-thin disabled:opacity-50"
         />
-        <button type="button" aria-label="Voice" className="grid h-9 w-9 place-items-center rounded-xl text-tertiary hover:text-primary hover:bg-white/5">
-          <FiMic />
-        </button>
         <button
           type="submit"
           disabled={thinking || disabled || !value.trim()}

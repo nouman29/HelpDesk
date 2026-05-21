@@ -381,9 +381,9 @@ export default function ChatPage() {
   return (
     <motion.div variants={pageTransition} initial="initial" animate="enter" exit="exit">
       <BareLayout>
-        <div className="grid h-screen lg:grid-cols-[280px_1fr]">
+        <div className="grid h-screen overflow-hidden lg:grid-cols-[280px_1fr]">
           {/* Desktop sidebar */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block min-h-0 h-screen" data-lenis-prevent>
             <Sidebar onNewJourney={startNew} />
           </div>
 
@@ -400,6 +400,7 @@ export default function ChatPage() {
                   initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
                   transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
                   className="lg:hidden fixed inset-y-0 left-0 z-50 w-72"
+                  data-lenis-prevent
                 >
                   <Sidebar onNewJourney={() => { startNew(); setSidebarOpen(false); }} />
                 </motion.div>
@@ -408,7 +409,7 @@ export default function ChatPage() {
           </AnimatePresence>
 
           {/* Main column */}
-          <div className="flex h-screen flex-col min-w-0">
+          <div className="flex h-screen flex-col min-w-0 min-h-0 overflow-hidden">
             <ChatHeader
               title={headerTitle}
               step={step}
@@ -416,15 +417,31 @@ export default function ChatPage() {
               onToggleSidebar={() => setSidebarOpen(true)}
             />
 
-            <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto scroll-thin">
-              <div className="mx-auto max-w-3xl px-4 md:px-6 py-6 flex flex-col gap-5 min-h-full">
+            <div
+              ref={scrollRef}
+              className="flex-1 min-h-0 overflow-y-auto scroll-thin overscroll-contain"
+              data-lenis-prevent
+            >
+              <div className="mx-auto max-w-3xl px-4 md:px-6 py-6 pb-10 flex flex-col gap-5 min-h-full">
                 {messages.map((m, i) => (
                   <MessageBubble key={m.id} message={m} index={i} />
                 ))}
 
                 {/* Options for the latest unanswered AI question */}
                 {latestOptionsMessageId && !thinking && phase !== 'complete' && (
-                  <div className="pl-11 -mt-1">
+                  <div className="pl-11 -mt-1 relative">
+                    {/* Vertical connector: aligned with the AI avatar's
+                        center (16px), gradient that fades from brand blue
+                        to violet and into transparent. Decorative only. */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute left-4 -top-4 bottom-2 w-px rounded-full"
+                      style={{
+                        background:
+                          'linear-gradient(to bottom, rgba(74,166,255,0.6), rgba(139,108,255,0.3) 55%, transparent)',
+                        boxShadow: '0 0 8px rgba(74,166,255,0.25)',
+                      }}
+                    />
                     <AnswerOptions
                       options={optionsForLatest}
                       disabled={thinking || phase === 'starting-chat'}

@@ -1,55 +1,78 @@
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiArrowUpRight, FiPlus, FiClock } from 'react-icons/fi';
+import { FiSearch, FiArrowUpRight, FiClock } from 'react-icons/fi';
 import { BareLayout } from '@/app/layouts/BareLayout';
 import { Sidebar } from '@/components/chat/Sidebar';
 import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { DUMMY_THREADS } from '@/data/chats';
-import { dateBucket, relativeTime } from '@/utils/format';
 import { ROUTES } from '@/constants/routes';
 import { pageTransition, fadeUp, stagger } from '@/utils/motion';
-import type { ChatThread } from '@/types';
-
-const DOMAIN_BADGE: Record<ChatThread['domain'], string> = {
-  career:   'from-sky-500/30 to-blue-700/0',
-  medical:  'from-emerald-500/30 to-teal-700/0',
-  legal:    'from-violet-500/30 to-fuchsia-700/0',
-  life:     'from-rose-500/30 to-pink-700/0',
-  business: 'from-amber-400/30 to-orange-700/0',
-};
+import { getMyChats, type MyChat } from '@/services/healthService';
+import { getToken, saveActiveChatId } from '@/features/auth/authStorage';
 
 export default function RecentChatsPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [chats, setChats] = useState<MyChat[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const grouped = useMemo(() => {
-    const filtered = DUMMY_THREADS.filter(
-      (t) =>
-        t.title.toLowerCase().includes(query.toLowerCase()) ||
-        t.preview.toLowerCase().includes(query.toLowerCase()) ||
-        t.domain.toLowerCase().includes(query.toLowerCase()),
-    );
-    const map = new Map<string, ChatThread[]>();
-    for (const t of filtered) {
-      const key = dateBucket(t.updatedAt);
-      const arr = map.get(key) ?? [];
-      arr.push(t);
-      map.set(key, arr);
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const token = getToken();
+      if (!token) {
+        if (!cancelled) {
+          setError('You are not logged in.');
+          setLoading(false);
+        }
+        return;
+      }
+      try {
+        const data = await getMyChats(token);
+        if (cancelled) return;
+        setChats(Array.isArray(data) ? data : []);
+      } catch (err) {
+        if (cancelled) return;
+        const msg = err instanceof Error ? err.message : 'Could not load your chats.';
+        setError(msg);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-    return Array.from(map.entries());
-  }, [query]);
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return chats;
+    return chats.filter((c) =>
+      (c.chat_name ?? '').toLowerCase().includes(q),
+    );
+  }, [chats, query]);
+
+  const hasActiveQuery = query.trim().length > 0;
+
+  const openChat = (chatId: number) => {
+    saveActiveChatId(chatId);
+    navigate(ROUTES.CHAT);
+  };
 
   return (
     <motion.div variants={pageTransition} initial="initial" animate="enter" exit="exit">
       <BareLayout>
-        <div className="grid h-screen lg:grid-cols-[280px_1fr]">
-          <div className="hidden lg:block">
+        <div className="grid h-screen overflow-hidden lg:grid-cols-[280px_1fr]">
+          <div className="hidden lg:block min-h-0 h-screen" data-lenis-prevent>
             <Sidebar onNewJourney={() => navigate(ROUTES.CHAT)} />
           </div>
 
-          <div className="flex flex-col min-w-0 overflow-y-auto scroll-thin">
+          <div
+            className="flex flex-col min-w-0 min-h-0 h-screen overflow-y-auto overscroll-contain scroll-thin"
+            data-lenis-prevent
+          >
             {/* Header */}
             <header className="sticky top-0 z-20 glass-strong border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -61,9 +84,6 @@ export default function RecentChatsPage() {
                   <h1 className="text-base md:text-lg font-semibold text-primary">Recent Chats</h1>
                 </div>
               </div>
-              <Button leftIcon={<FiPlus />} onClick={() => navigate(ROUTES.CHAT)}>
-                New Decision Journey
-              </Button>
             </header>
 
             <div className="mx-auto w-full max-w-5xl px-6 py-10 flex flex-col gap-10">
@@ -79,70 +99,113 @@ export default function RecentChatsPage() {
                     <span className="text-gradient">Your decision journeys.</span>
                   </h2>
                   <p className="mt-2 text-secondary max-w-2xl">
-                    Every journey you've started — grouped by recency, searchable by topic, opened in one tap.
+                    Every journey you've started — searchable by topic, opened in one tap.
                   </p>
                 </div>
                 <div className="max-w-xl">
                   <Input
                     name="search"
+                    type="search"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search journeys, topics, domains…"
+                    placeholder="Search your chats by title…"
                     leftIcon={<FiSearch />}
+                    autoComplete="off"
                   />
+                  {hasActiveQuery && !loading && !error && (
+                    <p className="mt-2 mono text-[10px] uppercase tracking-[0.22em] text-tertiary">
+                      {filtered.length} of {chats.length} match “{query.trim()}”
+                    </p>
+                  )}
                 </div>
               </motion.section>
 
-              {/* Groups */}
-              {grouped.length === 0 ? (
+              {/* States */}
+              {loading ? (
                 <div className="rounded-2xl glass border border-white/10 py-20 text-center text-tertiary">
-                  No journeys match “{query}”.
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                  </span>
+                  <p className="mt-3 mono text-[10px] uppercase tracking-[0.3em]">loading your chats</p>
+                </div>
+              ) : error ? (
+                <div className="rounded-2xl glass border border-rose-400/30 py-12 px-6 text-center text-rose-300">
+                  <p className="text-sm">Couldn't load your chats.</p>
+                  <p className="mt-1 text-xs text-tertiary">{error}</p>
+                </div>
+              ) : filtered.length === 0 ? (
+                <div className="rounded-2xl glass border border-white/10 py-20 text-center text-tertiary">
+                  {chats.length === 0
+                    ? 'No chats found yet.'
+                    : `No chats match “${query}”.`}
                 </div>
               ) : (
-                grouped.map(([bucket, threads]) => (
-                  <section key={bucket} className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
-                      <h3 className="mono text-[11px] uppercase tracking-[0.28em] text-tertiary">{bucket}</h3>
-                      <div className="flex-1 h-px bg-white/5" />
-                      <span className="mono text-[10px] text-tertiary">{threads.length}</span>
-                    </div>
+                <section className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <h3 className="mono text-[11px] uppercase tracking-[0.28em] text-tertiary">
+                      your chats
+                    </h3>
+                    <div className="flex-1 h-px bg-white/5" />
+                    <span className="mono text-[10px] text-tertiary">{filtered.length}</span>
+                  </div>
 
-                    <motion.ul
-                      variants={stagger(0.05, 0.02)}
-                      initial="hidden"
-                      whileInView="show"
-                      viewport={{ once: true, amount: 0.05 }}
-                      className="grid sm:grid-cols-2 gap-3"
-                    >
-                      {threads.map((t) => (
-                        <motion.li key={t.id} variants={fadeUp}>
-                          <button
-                            onClick={() => navigate(ROUTES.CHAT)}
-                            className="group relative w-full text-left rounded-2xl glass border border-white/10 hover:border-white/25 p-5 overflow-hidden spotlight transition-all duration-500"
-                            onMouseMove={(e) => {
-                              const r = e.currentTarget.getBoundingClientRect();
-                              e.currentTarget.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
-                              e.currentTarget.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
-                            }}
+                  <motion.ul
+                    variants={stagger(0.05, 0.02)}
+                    initial="hidden"
+                    animate="show"
+                    className="grid sm:grid-cols-2 gap-3"
+                  >
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      {filtered.map((c) => {
+                        const pct = Math.max(0, Math.min(100, Math.round(c.completion_percentage)));
+                        return (
+                          <motion.li
+                            key={c.chat_id}
+                            variants={fadeUp}
+                            layout
+                            exit={{ opacity: 0, y: -8, transition: { duration: 0.18 } }}
                           >
-                            <div className={`pointer-events-none absolute -top-20 -right-16 h-48 w-48 rounded-full bg-gradient-to-br ${DOMAIN_BADGE[t.domain]} blur-3xl opacity-50 group-hover:opacity-90 transition-opacity duration-500`} />
-                            <div className="relative flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <span className="mono text-[10px] uppercase tracking-[0.22em] text-tertiary">
-                                  {t.domain}
-                                </span>
-                                <h4 className="mt-1.5 font-semibold text-primary line-clamp-2">{t.title}</h4>
-                                <p className="mt-2 text-sm text-secondary line-clamp-2">{t.preview}</p>
-                                <p className="mt-3 text-xs text-tertiary">{relativeTime(t.updatedAt)}</p>
+                            <button
+                              onClick={() => openChat(c.chat_id)}
+                              className="group relative w-full text-left rounded-2xl glass border border-white/10 hover:border-white/25 p-5 overflow-hidden spotlight transition-all duration-500"
+                              onMouseMove={(e) => {
+                                const r = e.currentTarget.getBoundingClientRect();
+                                e.currentTarget.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+                                e.currentTarget.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+                              }}
+                            >
+                              <div className="pointer-events-none absolute -top-20 -right-16 h-48 w-48 rounded-full bg-gradient-to-br from-sky-500/30 to-blue-700/0 blur-3xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
+                              <div className="relative flex items-start justify-between gap-3">
+                                <div className="min-w-0 flex-1">
+                                  <h4 className="font-semibold text-primary line-clamp-2">
+                                    {c.chat_name}
+                                  </h4>
+                                  <p className="mt-2 text-sm text-secondary">
+                                    {c.total_answered_questions} of {c.total_questions} questions answered
+                                  </p>
+
+                                  {/* Progress bar */}
+                                  <div className="mt-3 h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full bg-gradient-to-r from-[#1f86ff] to-[#8b6cff] transition-all duration-500"
+                                      style={{ width: `${pct}%` }}
+                                    />
+                                  </div>
+                                  <p className="mt-2 mono text-[10px] uppercase tracking-[0.22em] text-tertiary">
+                                    {pct}% complete
+                                  </p>
+                                </div>
+                                <FiArrowUpRight className="shrink-0 text-tertiary group-hover:text-[var(--brand-300)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
                               </div>
-                              <FiArrowUpRight className="shrink-0 text-tertiary group-hover:text-[var(--brand-300)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
-                            </div>
-                          </button>
-                        </motion.li>
-                      ))}
-                    </motion.ul>
-                  </section>
-                ))
+                            </button>
+                          </motion.li>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </motion.ul>
+                </section>
               )}
             </div>
           </div>
