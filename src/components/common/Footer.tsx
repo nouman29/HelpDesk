@@ -10,13 +10,13 @@ export function Footer() {
     <footer className="relative mt-32 border-t border-white/5">
       <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-[var(--brand-400)]/40 to-transparent" />
       <div
-        className="absolute -top-40 left-1/2 -translate-x-1/2 aurora h-[420px] w-[820px] opacity-30"
+        className="absolute -top-40 left-1/2 -translate-x-1/2 aurora h-[420px] w-full max-w-205 opacity-30"
         style={{
           background: "radial-gradient(closest-side, #1f86ff, transparent 70%)",
         }}
       />
 
-      <div className="mx-auto max-w-7xl px-6 py-20">
+      <div className="mx-auto md:max-w-7xl px-6 py-20">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-10">
           <div className="col-span-2 flex flex-col gap-5">
             <Logo />
