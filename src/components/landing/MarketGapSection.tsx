@@ -156,11 +156,13 @@ function ComparisonCard({ title, badge, tone, items, highlight = false, isLight 
                   'grid h-5 w-5 shrink-0 place-items-center rounded-full border',
                   it.has && highlight
                     ? isLight
-                      ? 'border-green-700/60 bg-green-800 text-green-100'
+                      ? 'border-green-600/60 bg-green-600 text-green-100'
                       : 'border-[color:var(--accent-cyan)]/40 bg-[color:var(--accent-cyan)]/10 text-[color:var(--accent-cyan)]'
                     : it.has
                       ? 'border-white/15 bg-white/5 text-secondary'
-                      : 'border-white/5 bg-white/[0.02] text-tertiary',
+                      : isLight
+                        ? 'border-slate-400/60 bg-red-50/50 text-slate-500'
+                        : 'border-white/5 bg-white/2 text-tertiary',
                 )}
               >
                 {it.has ? <FiCheck size={11} /> : <FiX size={11} />}
