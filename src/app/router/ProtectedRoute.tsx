@@ -9,13 +9,14 @@ interface Props {
 
 /**
  * Gate a route behind the presence of a token in localStorage.
- * Redirects to /login (preserving the original target via state.from) when
- * the user has no token.
+ * Redirects to the landing page (preserving the original target via
+ * state.from) when the user has no token, even if they typed the URL
+ * directly into the address bar.
  */
 export function ProtectedRoute({ children }: Props) {
   const location = useLocation();
   if (!isAuthenticated()) {
-    return <Navigate to={ROUTES.LOGIN} replace state={{ from: location.pathname }} />;
+    return <Navigate to={ROUTES.LANDING} replace state={{ from: location.pathname }} />;
   }
   return children;
 }

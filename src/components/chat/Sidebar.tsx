@@ -180,6 +180,11 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
         <span className="mono text-[10px] uppercase text-tertiary">all</span>
       </button>
 
+      {/* Theme-aware divider — uses the soft border token so it auto-flips
+          between dark and light themes (rgba(255,255,255,0.08) in dark,
+          rgba(10,20,40,0.08) in light). */}
+      <hr className="border-0 h-px bg-[var(--border-soft)] my-1" />
+
       <div className="flex items-center justify-between mt-2 px-1">
         <span className="mono text-[10px] uppercase tracking-[0.25em] text-tertiary">Recent</span>
         <span className="mono text-[10px] text-tertiary">
@@ -233,7 +238,7 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
         )}
       </nav>
 
-      <div className="border-t border-white/5 pt-3 flex flex-col gap-1">
+      <div className="border-t border-[var(--border-soft)] pt-3 flex flex-col gap-1">
         <SidebarItem
           icon={<FiLogOut />}
           label="Logout"
