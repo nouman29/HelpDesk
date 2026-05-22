@@ -2,11 +2,8 @@ import { motion } from 'framer-motion';
 import { SiteLayout } from '@/app/layouts/SiteLayout';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { JourneySection } from '@/components/landing/JourneySection';
-import { ProblemSection } from '@/components/landing/ProblemSection';
-import { FeaturesSection } from '@/components/landing/FeaturesSection';
-import { DomainsSection } from '@/components/landing/DomainsSection';
-import { ShowcaseSection } from '@/components/landing/ShowcaseSection';
-import { CTASection } from '@/components/landing/CTASection';
+import { AIFlowPreview } from '@/components/landing/AIFlowPreview';
+import { MarketGapSection } from '@/components/landing/MarketGapSection';
 import { pageTransition } from '@/utils/motion';
 
 export default function LandingPage() {
@@ -20,11 +17,8 @@ export default function LandingPage() {
       <SiteLayout>
         <HeroSection />
         <JourneySection />
-        <ProblemSection />
-        <FeaturesSection />
-        <DomainsSection />
-        <ShowcaseSection />
-        <CTASection />
+        <AIFlowPreview />
+        <MarketGapSection />
       </SiteLayout>
     </motion.div>
   );

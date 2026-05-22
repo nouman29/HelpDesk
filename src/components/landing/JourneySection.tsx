@@ -81,10 +81,9 @@ export function JourneySection() {
   const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
   return (
-    <section id="journeys" ref={ref} className="relative py-32">
+    <section id="the-problem" ref={ref} className="relative py-32">
       <motion.div style={{ y }} className="mx-auto max-w-7xl px-6">
         <SectionHeading
-          eyebrow="The Problem"
           title="The Problem With AI Today"
           subtitle="Modern AI tools give you conversations. What you actually need are conclusions."
         />

@@ -3,7 +3,7 @@ import { FiArrowRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { MagneticButton } from "@/components/animations/MagneticButton";
-import { AIOrb } from "@/components/three/AIOrb";
+import Orb from "@/components/three/Orb";
 import { HeroBackground } from "@/components/three/HeroBackground";
 import { AuroraBlob } from "@/components/animations/AuroraBlob";
 import { ROUTES } from "@/constants/routes";
@@ -86,7 +86,18 @@ export function HeroSection() {
           transition={{ duration: 1.1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="relative aspect-square w-full max-w-[640px] mx-auto"
         >
-          <AIOrb className="absolute inset-0" />
+          <div className="absolute inset-0">
+            {/* React Bits "Orb" — pure ogl, no three.js / fiber. Brand
+                tints are already baked into the shader; backgroundColor
+                stays transparent-dark so the skyly app shell shows
+                through. */}
+            <Orb
+              hue={0}
+              hoverIntensity={0.35}
+              rotateOnHover
+              backgroundColor="#06080f"
+            />
+          </div>
           <HeroAssistantCard />
         </motion.div>
       </div>
@@ -112,12 +123,12 @@ function HeroAssistantCard() {
         </span>
       </div>
       <p className="text-[13px] leading-relaxed text-secondary">
-        “Let's narrow this. You have{" "}
-        <span className="text-primary">9 months runway</span>. Two paths remain.
-        I'll stress-test each against your re-entry risk next.”
+        “Based on your answers, I’m narrowing the picture. Your symptoms point
+        to <span className="text-primary">3 likely conclusions</span> — a few
+        more questions and I’ll rank them by probability and accuracy.”
       </p>
       <div className="mt-3 flex items-center justify-between text-[11px] text-tertiary mono">
-        <span>step 03 of 05</span>
+        <span>11 of 12 answered · 91%</span>
         <div className="flex gap-1">
           <span className="typing-dot" />
           <span className="typing-dot" />

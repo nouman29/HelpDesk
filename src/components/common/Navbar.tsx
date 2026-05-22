@@ -83,13 +83,24 @@ export function Navbar({ transparent = true }: Props) {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            {PRIMARY_NAV.map((item) =>
-              isRouteHref(item.href) ? (
+            {PRIMARY_NAV.map((item, i) => {
+              const prev = PRIMARY_NAV[i - 1];
+              // Insert a fading vertical separator at the boundary between
+              // in-page anchor items (#...) and route items (/...). With
+              // the current PRIMARY_NAV this naturally lands right after
+              // "Why HelpDesk", before "Chat".
+              const needsSeparator =
+                prev && !isRouteHref(prev.href) && isRouteHref(item.href);
+
+              const linkClass =
+                'link-anim px-3 py-2 text-sm text-secondary hover:text-primary transition-colors';
+
+              const node = isRouteHref(item.href) ? (
                 <Link
                   key={item.label}
                   to={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="link-anim px-3 py-2 text-sm text-secondary hover:text-primary transition-colors"
+                  className={linkClass}
                 >
                   {item.label}
                 </Link>
@@ -98,16 +109,27 @@ export function Navbar({ transparent = true }: Props) {
                   key={item.label}
                   href={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="link-anim px-3 py-2 text-sm text-secondary hover:text-primary transition-colors"
+                  className={linkClass}
                 >
                   {item.label}
                 </a>
-              ),
-            )}
+              );
+
+              return needsSeparator ? (
+                <span key={`group-${item.label}`} className="flex items-center gap-1">
+                  <NavSeparator />
+                  {node}
+                </span>
+              ) : (
+                node
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle className="hidden sm:inline-flex" />
+            {/* Vertical separator between the nav cluster and the auth button. */}
+            <NavSeparator className="hidden sm:inline-block" />
             {authed ? (
               <Button
                 variant="ghost"
@@ -181,5 +203,23 @@ export function Navbar({ transparent = true }: Props) {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+/**
+ * A thin vertical separator whose top and bottom ends fade to
+ * transparent. Used to group the navbar's anchor links apart from the
+ * route links, and to set the auth button off from the nav cluster.
+ */
+function NavSeparator({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn('mx-1 h-5 w-px self-center', className)}
+      style={{
+        background:
+          'linear-gradient(to bottom, transparent, rgba(255,255,255,0.18) 50%, transparent)',
+      }}
+    />
   );
 }
