@@ -14,7 +14,7 @@ export function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
+    <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-40 md:pt-0">
       {/* 3D ambient background */}
       <HeroBackground className="absolute inset-0 -z-10" />
 

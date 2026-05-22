@@ -10,7 +10,7 @@ export function Footer() {
     <footer className="relative mt-32 border-t border-white/5">
       <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-[var(--brand-400)]/40 to-transparent" />
       <div
-        className="absolute -top-40 left-1/2 -translate-x-1/2 aurora h-[420px] w-[820px] opacity-30"
+        className="absolute -top-40 left-1/2 -translate-x-1/2 aurora h-[420px] w-full md:w-[820px] opacity-30"
         style={{
           background: "radial-gradient(closest-side, #1f86ff, transparent 70%)",
         }}

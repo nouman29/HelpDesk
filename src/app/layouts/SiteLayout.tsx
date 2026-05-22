@@ -9,7 +9,7 @@ export function SiteLayout({ children, transparentNav = true }: Props) {
   return (
     <>
       <ScrollProgressBar />
-      <Navbar transparent={transparentNav} />
+      <Navbar transparent={transparentNav} /> 
       <main>{children}</main>
       <Footer />
     </>
