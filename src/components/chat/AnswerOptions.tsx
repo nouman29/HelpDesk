@@ -11,8 +11,7 @@ interface Props {
 /**
  * Renders backend `possible_answers` as a grid of selectable, glass-styled boxes.
  * Each option is its own clickable box that calls `onSelect(value)` with the
- * exact string. Styling intentionally mirrors PromptSuggestions so the chat
- * keeps a single visual language across dark/light themes.
+ * exact string.
  */
 export function AnswerOptions({ options, disabled = false, onSelect }: Props) {
   if (!options || options.length === 0) return null;

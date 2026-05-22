@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { AuroraBlob } from '@/components/animations/AuroraBlob';
 import { fadeUp, stagger, EASE_OUT_EXPO } from '@/utils/motion';
 import { cn } from '@/utils/cn';
+import { useTheme } from '@/features/theme/ThemeContext';
 
 /* ---------- Data ----------
  *
@@ -90,9 +91,10 @@ interface ComparisonCardProps {
   tone: BadgeTone;
   items: ComparisonItem[];
   highlight?: boolean;
+  isLight?: boolean;
 }
 
-function ComparisonCard({ title, badge, tone, items, highlight = false }: ComparisonCardProps) {
+function ComparisonCard({ title, badge, tone, items, highlight = false, isLight = false }: ComparisonCardProps) {
   // Non-highlighted competitor cards are intentionally dimmed and desaturated
   // so the eye locks onto the one HelpDesk card. The highlighted card keeps
   // full saturation, the gradient border, and the halo.
@@ -134,7 +136,10 @@ function ComparisonCard({ title, badge, tone, items, highlight = false }: Compar
           </h3>
           <Badge
             tone={highlight ? tone : 'neutral'}
-            className="shrink-0"
+            className={cn(
+              'shrink-0',
+              highlight && isLight && 'bg-green-900 text-green-100 border-green-800',
+            )}
           >
             {badge}
           </Badge>
@@ -150,7 +155,9 @@ function ComparisonCard({ title, badge, tone, items, highlight = false }: Compar
                 className={cn(
                   'grid h-5 w-5 shrink-0 place-items-center rounded-full border',
                   it.has && highlight
-                    ? 'border-[color:var(--accent-cyan)]/40 bg-[color:var(--accent-cyan)]/10 text-[color:var(--accent-cyan)]'
+                    ? isLight
+                      ? 'border-green-700/60 bg-green-800 text-green-100'
+                      : 'border-[color:var(--accent-cyan)]/40 bg-[color:var(--accent-cyan)]/10 text-[color:var(--accent-cyan)]'
                     : it.has
                       ? 'border-white/15 bg-white/5 text-secondary'
                       : 'border-white/5 bg-white/[0.02] text-tertiary',
@@ -180,6 +187,9 @@ function ComparisonCard({ title, badge, tone, items, highlight = false }: Compar
 /* ---------- Section ---------- */
 
 export function MarketGapSection() {
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
+
   return (
     <section
       id="why-helpdesk"
@@ -213,6 +223,7 @@ export function MarketGapSection() {
               badge={tool.badge}
               tone={tool.tone}
               highlight={tool.highlight}
+              isLight={isLight}
               items={COMPARISON_FEATURES.map((feat, i) => ({
                 label: feat,
                 has: tool.features[i],

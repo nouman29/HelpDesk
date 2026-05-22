@@ -14,26 +14,9 @@ export interface ChatMessage {
   answered?: boolean;
 }
 
-export interface ChatThread {
-  id: string;
-  title: string;
-  domain: 'career' | 'medical' | 'legal' | 'life' | 'business';
-  preview: string;
-  updatedAt: number;
-  messages?: ChatMessage[];
-}
-
 export interface DecisionStep {
   id: string;
   title: string;
   description: string;
   type: 'question' | 'branch' | 'outcome';
-}
-
-export interface FeatureCard {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  accent?: string;
 }

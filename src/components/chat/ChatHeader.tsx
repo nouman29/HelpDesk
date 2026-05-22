@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FiMenu, FiShare2, FiBookmark } from 'react-icons/fi';
+import { FiMenu } from 'react-icons/fi';
 import { ThemeToggle } from '@/features/theme/ThemeToggle';
 
 interface Props {
@@ -35,18 +35,6 @@ export function ChatHeader({ title, step, totalSteps, onToggleSidebar }: Props) 
       </div>
 
       <div className="flex items-center gap-1">
-        <button
-          aria-label="Bookmark"
-          className="hidden sm:grid h-9 w-9 place-items-center rounded-full glass border border-white/10 text-secondary hover:text-primary"
-        >
-          <FiBookmark size={15} />
-        </button>
-        <button
-          aria-label="Share"
-          className="hidden sm:grid h-9 w-9 place-items-center rounded-full glass border border-white/10 text-secondary hover:text-primary"
-        >
-          <FiShare2 size={15} />
-        </button>
         <ThemeToggle />
       </div>
     </motion.header>

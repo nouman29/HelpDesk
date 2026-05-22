@@ -73,11 +73,6 @@ export default function SignupPage() {
             <Input label="Password"         name="password"         leftIcon={<FiLock />}  placeholder="••••••••" type="password" required />
             <Input label="Confirm password" name="confirm_password" leftIcon={<FiLock />}  placeholder="••••••••" type="password" required />
 
-            <div className="flex items-center gap-2 mt-1 text-xs text-tertiary">
-              <input type="checkbox" id="tos" className="accent-[var(--brand-500)]" defaultChecked />
-              <label htmlFor="tos">I agree to the Terms and Privacy Policy.</label>
-            </div>
-
             <Button
               size="lg"
               rightIcon={<FiArrowRight />}

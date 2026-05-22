@@ -53,7 +53,7 @@ export function ChatInput({ onSend, thinking, disabled }: Props) {
         </button>
       </div>
       <p className="mt-2 text-center text-[11px] text-tertiary">
-        AI HelpDesk converges to a decision in ~5 structured steps. Press <kbd className="mono rounded border border-white/10 bg-white/5 px-1.5 py-0.5">↵</kbd> to send.
+        AI HelpDesk converges to a decision.
       </p>
     </form>
   );
