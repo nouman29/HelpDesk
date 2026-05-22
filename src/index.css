@@ -36,6 +36,7 @@
   --text-2:   #b8c4d9;
   --text-3:   #7a8aa6;
   --shadow-glow: 0 0 60px -10px rgba(74, 166, 255, 0.45);
+  --nav-separator: rgba(255, 255, 255, 0.9);
 
   /* Sky gradients */
   --sky-1: radial-gradient(1200px 600px at 20% 0%, rgba(31,134,255,0.20), transparent 60%),
@@ -56,6 +57,7 @@
   --text-2:   #3a4866;
   --text-3:   #6b7a96;
   --shadow-glow: 0 30px 80px -30px rgba(10, 102, 230, 0.25);
+  --nav-separator: rgba(0, 0, 0, 1);
   --sky-1: radial-gradient(1200px 600px at 20% 0%, rgba(31,134,255,0.18), transparent 60%),
            radial-gradient(900px 500px at 80% 10%, rgba(139,108,255,0.14), transparent 60%),
            radial-gradient(800px 600px at 50% 100%, rgba(62,232,255,0.12), transparent 60%);

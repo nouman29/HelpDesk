@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { ROUTES } from '@/constants/routes';
@@ -12,10 +12,23 @@ const ChatPage        = lazy(() => import('@/pages/chat/ChatPage'));
 const RecentChatsPage = lazy(() => import('@/pages/chat/RecentChatsPage'));
 const NotFoundPage    = lazy(() => import('@/pages/NotFoundPage'));
 
+// Resets Lenis' internal scroll position on every route change so its
+// cached position can't desync from the browser's actual scroll (0).
+// Without this, navigating while scrolled partway down causes Lenis to
+// fight the browser and the page appears frozen.
+function LenisRouteSync() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.__lenis?.scrollTo(0, { immediate: true });
+  }, [pathname]);
+  return null;
+}
+
 export function AppRouter() {
   const location = useLocation();
   return (
     <Suspense fallback={<RouteFallback />}>
+      <LenisRouteSync />
       <AnimatePresence mode="wait" initial={false}>
         <Routes location={location} key={location.pathname}>
           <Route path={ROUTES.LANDING}     element={<LandingPage />} />

@@ -218,7 +218,7 @@ function NavSeparator({ className }: { className?: string }) {
       className={cn('mx-1 h-5 w-px self-center', className)}
       style={{
         background:
-          'linear-gradient(to bottom, transparent, rgba(255,255,255,0.18) 50%, transparent)',
+          'linear-gradient(to bottom, transparent, var(--nav-separator) 50%, transparent)',
       }}
     />
   );
