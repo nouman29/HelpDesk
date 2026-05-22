@@ -29,6 +29,9 @@ import {
   saveActiveChatId,
   removeActiveChatId,
 } from '@/features/auth/authStorage';
+import { showErrorToast } from '@/utils/toast';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { requestChatListRefresh } from '@/features/chat/chatListRefresh';
 
 const THINKING_PLACEHOLDER: ChatMessage = {
   id: 'thinking',
@@ -51,7 +54,12 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [thinking, setThinking] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isLgUp = useMediaQuery('(min-width: 1024px)');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isLgUp) setSidebarOpen(false);
+  }, [isLgUp]);
 
   const [phase, setPhase] = useState<Phase>('bootstrapping');
   const [initialQueue, setInitialQueue] = useState<InitialQuestion[]>([]);
@@ -65,7 +73,6 @@ export default function ChatPage() {
     percentage: number;
   } | null>(null);
   const [conclusions, setConclusions] = useState<Conclusion[]>([]);
-  const [errorText, setErrorText] = useState<string | null>(null);
 
   /* ----------------------- Helpers ----------------------- */
 
@@ -88,19 +95,6 @@ export default function ChatPage() {
     setMessages((m) => [
       ...m,
       { id: `u-${Date.now()}`, role: 'user', content: text, createdAt: Date.now() },
-    ]);
-  };
-
-  const pushError = (msg: string) => {
-    setErrorText(msg);
-    setMessages((m) => [
-      ...m,
-      {
-        id: `err-${Date.now()}`,
-        role: 'ai',
-        content: `Sorry — ${msg}`,
-        createdAt: Date.now(),
-      },
     ]);
   };
 
@@ -217,7 +211,6 @@ export default function ChatPage() {
     async function bootstrap() {
       setPhase('bootstrapping');
       setThinking(true);
-      setErrorText(null);
       const token = getToken();
       const existingChatId = getActiveChatId();
 
@@ -254,8 +247,7 @@ export default function ChatPage() {
         setPhase('asking-initial');
       } catch (err) {
         if (cancelled) return;
-        const msg = err instanceof Error ? err.message : 'Failed to load questions.';
-        pushError(msg);
+        showErrorToast(err, 'chat');
         setPhase('error');
       } finally {
         if (!cancelled) setThinking(false);
@@ -286,7 +278,6 @@ export default function ChatPage() {
     pushUser(trimmed);
     markLatestOptionsAnswered();
     setThinking(true);
-    setErrorText(null);
 
     try {
       if (phase === 'asking-initial') {
@@ -313,6 +304,7 @@ export default function ChatPage() {
             pushAIQuestion(resp.question, resp.possible_answers ?? [], resp.question_id);
           }
           setPhase('in-chat');
+          requestChatListRefresh();
         }
       } else if (phase === 'in-chat') {
         const token = getToken();
@@ -335,6 +327,7 @@ export default function ChatPage() {
           );
           setPhase('complete');
           removeActiveChatId();
+          requestChatListRefresh();
         } else {
           const resp = await apiSendAnswer(token, chatId, answer);
           applyServerProgress(resp);
@@ -347,12 +340,12 @@ export default function ChatPage() {
           if (resp.completion_percentage >= 100) {
             setPhase('complete');
             removeActiveChatId();
+            requestChatListRefresh();
           }
         }
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Something went wrong.';
-      pushError(msg);
+      showErrorToast(err, 'chat');
       // If we failed mid-conclude, drop back to in-chat so the user can retry.
       setPhase((p) => (p === 'concluding' ? 'in-chat' : p));
     } finally {
@@ -375,7 +368,6 @@ export default function ChatPage() {
     setCurrentQuestionId(null);
     setProgress(null);
     setConclusions([]);
-    setErrorText(null);
     setCollectedInitial([]);
     setInitialIndex(0);
     setInitialQueue([]);
@@ -389,8 +381,7 @@ export default function ChatPage() {
       pushAIQuestion(questions[0].title, questions[0].possible_answers, questions[0].id);
       setPhase('asking-initial');
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to load questions.';
-      pushError(msg);
+      showErrorToast(err, 'chat');
       setPhase('error');
     } finally {
       setThinking(false);
@@ -435,14 +426,16 @@ export default function ChatPage() {
     <motion.div variants={pageTransition} initial="initial" animate="enter" exit="exit">
       <BareLayout>
         <div className="grid h-screen overflow-hidden lg:grid-cols-[280px_1fr]">
-          {/* Desktop sidebar */}
-          <div className="hidden lg:block min-h-0 h-screen" data-lenis-prevent>
-            <Sidebar onNewJourney={startNew} />
-          </div>
+          {/* Desktop sidebar — not mounted on mobile (avoids duplicate SVG ids / API calls) */}
+          {isLgUp && (
+            <div className="min-h-0 h-screen" data-lenis-prevent>
+              <Sidebar onNewJourney={startNew} />
+            </div>
+          )}
 
           {/* Mobile sidebar drawer */}
           <AnimatePresence>
-            {sidebarOpen && (
+            {!isLgUp && sidebarOpen && (
               <>
                 <motion.div
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -525,11 +518,6 @@ export default function ChatPage() {
                 thinking={thinking}
                 disabled={inputDisabled}
               />
-              {errorText && (
-                <p className="mt-2 text-center text-[11px] text-[var(--accent-rose)]">
-                  {errorText}
-                </p>
-              )}
             </div>
           </div>
         </div>

@@ -11,11 +11,11 @@ import { ROUTES } from '@/constants/routes';
 import { pageTransition } from '@/utils/motion';
 import { loginUser } from '@/services/authService';
 import { saveToken } from '@/features/auth/authStorage';
+import { showErrorToast, showValidationToast } from '@/utils/toast';
 
 export default function LoginPage() {
   const [wiping, setWiping] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -28,11 +28,10 @@ export default function LoginPage() {
     const password = String(data.get('password') ?? '');
 
     if (!email || !password) {
-      setError('Please enter your email and password.');
+      showValidationToast('Enter your email and password.');
       return;
     }
 
-    setError(null);
     setSubmitting(true);
     try {
       const { token } = await loginUser({ email, password });
@@ -40,8 +39,7 @@ export default function LoginPage() {
       setWiping(true);
       window.setTimeout(() => navigate(ROUTES.LANDING), 800);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Could not sign in.';
-      setError(msg);
+      showErrorToast(err, 'auth');
       setSubmitting(false);
     }
   };
@@ -64,15 +62,6 @@ export default function LoginPage() {
                 Remember me
               </label>
             </div>
-
-            {error && (
-              <p
-                role="alert"
-                className="rounded-xl glass border border-rose-400/30 px-3 py-2 text-xs text-rose-300"
-              >
-                {error}
-              </p>
-            )}
 
             <Button
               size="lg"

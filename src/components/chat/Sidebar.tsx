@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -14,6 +14,7 @@ import {
   saveActiveChatId,
 } from '@/features/auth/authStorage';
 import { getMyChats, type MyChat } from '@/services/healthService';
+import { subscribeChatListRefresh } from '@/features/chat/chatListRefresh';
 
 interface Props {
   activeId?: number;
@@ -39,7 +40,7 @@ function CircularProgress({ value, active = false }: CircularProgressProps) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const offset = c * (1 - value / 100);
-  const gradientId = `cp-grad-${value}-${active ? 'a' : 'i'}`;
+  const gradientId = useId().replace(/:/g, '');
 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -47,7 +48,7 @@ function CircularProgress({ value, active = false }: CircularProgressProps) {
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
-        className="-rotate-90"
+        className="-rotate-90 overflow-visible"
         aria-hidden
       >
         <defs>
@@ -101,34 +102,32 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
   // prop, or read from the same localStorage key the ChatPage uses).
   const highlightedId = activeId ?? getActiveChatId();
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      const token = getToken();
-      if (!token) {
-        if (!cancelled) {
-          setError('Not signed in');
-          setLoading(false);
-        }
-        return;
-      }
-      try {
-        const data = await getMyChats(token);
-        if (cancelled) return;
-        setChats(Array.isArray(data) ? data : []);
-      } catch (err) {
-        if (cancelled) return;
-        const msg = err instanceof Error ? err.message : 'Could not load chats.';
-        setError(msg);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+  const fetchChats = useCallback(async (silent = false) => {
+    const token = getToken();
+    if (!token) {
+      setError('Not signed in');
+      setLoading(false);
+      return;
     }
-    load();
-    return () => {
-      cancelled = true;
-    };
+    if (!silent) setLoading(true);
+    try {
+      const data = await getMyChats(token);
+      setChats(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not load chats.';
+      setError(msg);
+    } finally {
+      if (!silent) setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void fetchChats();
+    return subscribeChatListRefresh(() => {
+      void fetchChats(true);
+    });
+  }, [fetchChats]);
 
   const openChat = (chatId: number) => {
     saveActiveChatId(chatId);

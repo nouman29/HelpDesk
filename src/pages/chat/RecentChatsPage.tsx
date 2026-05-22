@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiArrowUpRight, FiClock, FiPlus } from 'react-icons/fi';
+import { FiSearch, FiArrowUpRight, FiClock, FiPlus, FiMenu } from 'react-icons/fi';
 import { BareLayout } from '@/app/layouts/BareLayout';
 import { Sidebar } from '@/components/chat/Sidebar';
 import { Input } from '@/components/ui/Input';
@@ -9,6 +9,7 @@ import { ROUTES } from '@/constants/routes';
 import { pageTransition, fadeUp, stagger } from '@/utils/motion';
 import { getMyChats, type MyChat } from '@/services/healthService';
 import { getToken, saveActiveChatId } from '@/features/auth/authStorage';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 export default function RecentChatsPage() {
   const navigate = useNavigate();
@@ -16,6 +17,12 @@ export default function RecentChatsPage() {
   const [chats, setChats] = useState<MyChat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isLgUp = useMediaQuery('(min-width: 1024px)');
+
+  useEffect(() => {
+    if (isLgUp) setSidebarOpen(false);
+  }, [isLgUp]);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,18 +72,58 @@ export default function RecentChatsPage() {
     <motion.div variants={pageTransition} initial="initial" animate="enter" exit="exit">
       <BareLayout>
         <div className="grid h-screen overflow-hidden lg:grid-cols-[280px_1fr]">
-          <div className="hidden lg:block min-h-0 h-screen" data-lenis-prevent>
-            <Sidebar onNewJourney={() => navigate(ROUTES.CHAT)} />
-          </div>
+          {isLgUp && (
+            <div className="min-h-0 h-screen" data-lenis-prevent>
+              <Sidebar onNewJourney={() => navigate(ROUTES.CHAT)} />
+            </div>
+          )}
+
+          {/* Mobile sidebar drawer */}
+          <AnimatePresence>
+            {!isLgUp && sidebarOpen && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur"
+                  onClick={() => setSidebarOpen(false)}
+                />
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '-100%' }}
+                  transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
+                  className="lg:hidden fixed inset-y-0 left-0 z-50 w-72"
+                  data-lenis-prevent
+                >
+                  <Sidebar
+                    onNewJourney={() => {
+                      navigate(ROUTES.CHAT);
+                      setSidebarOpen(false);
+                    }}
+                  />
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
 
           <div
             className="flex flex-col min-w-0 min-h-0 h-screen overflow-y-auto overscroll-contain scroll-thin"
             data-lenis-prevent
           >
             {/* Header */}
-            <header className="sticky top-0 z-20 glass-strong border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="grid h-9 w-9 place-items-center rounded-full glass border border-white/10 text-[var(--brand-300)]">
+            <header className="sticky top-0 z-20 glass-strong border-b border-white/5 px-4 md:px-6 py-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="Open menu"
+                  className="lg:hidden shrink-0 grid h-9 w-9 place-items-center rounded-full glass border border-white/10"
+                >
+                  <FiMenu />
+                </button>
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full glass border border-white/10 text-[var(--brand-300)]">
                   <FiClock />
                 </div>
                 <div>

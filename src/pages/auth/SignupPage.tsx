@@ -11,11 +11,11 @@ import { ROUTES } from '@/constants/routes';
 import { pageTransition } from '@/utils/motion';
 import { registerUser } from '@/services/authService';
 import { saveToken } from '@/features/auth/authStorage';
+import { showErrorToast, showValidationToast } from '@/utils/toast';
 
 export default function SignupPage() {
   const [wiping, setWiping] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -30,19 +30,18 @@ export default function SignupPage() {
     const confirmPassword = String(data.get('confirm_password') ?? '');
 
     if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields.');
+      showValidationToast('Fill in all fields.');
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      showValidationToast('Password must be at least 6 characters.');
       return;
     }
     if (password !== confirmPassword) {
-      setError('Password and confirm password do not match.');
+      showValidationToast("Passwords don't match.");
       return;
     }
 
-    setError(null);
     setSubmitting(true);
     try {
       const { token } = await registerUser({
@@ -55,8 +54,7 @@ export default function SignupPage() {
       setWiping(true);
       window.setTimeout(() => navigate(ROUTES.LANDING), 900);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Could not create account.';
-      setError(msg);
+      showErrorToast(err, 'auth');
       setSubmitting(false);
     }
   };
@@ -79,15 +77,6 @@ export default function SignupPage() {
               <input type="checkbox" id="tos" className="accent-[var(--brand-500)]" defaultChecked />
               <label htmlFor="tos">I agree to the Terms and Privacy Policy.</label>
             </div>
-
-            {error && (
-              <p
-                role="alert"
-                className="rounded-xl glass border border-rose-400/30 px-3 py-2 text-xs text-rose-300"
-              >
-                {error}
-              </p>
-            )}
 
             <Button
               size="lg"
