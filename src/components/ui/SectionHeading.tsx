@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Badge } from './Badge';
-import { fadeUp, stagger } from '@/utils/motion';
+import { slideFromLeft, stagger } from '@/utils/motion';
 import { cn } from '@/utils/cn';
 
 interface Props {
@@ -27,19 +27,19 @@ export function SectionHeading({
       )}
     >
       {eyebrow && (
-        <motion.div variants={fadeUp}>
+        <motion.div variants={slideFromLeft}>
           <Badge tone="brand">{eyebrow}</Badge>
         </motion.div>
       )}
       <motion.h2
-        variants={fadeUp}
+        variants={slideFromLeft}
         className="max-w-3xl text-4xl md:text-5xl lg:text-6xl font-semibold leading-[1.05] tracking-tight"
       >
         <span className="text-gradient">{title}</span>
       </motion.h2>
       {subtitle && (
         <motion.p
-          variants={fadeUp}
+          variants={slideFromLeft}
           className={cn(
             'max-w-2xl text-base md:text-lg text-secondary leading-relaxed',
             align === 'center' && 'text-center',
