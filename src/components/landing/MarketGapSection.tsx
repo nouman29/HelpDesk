@@ -4,7 +4,7 @@ import { SectionHeading } from '@/components/ui/SectionHeading';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { AuroraBlob } from '@/components/animations/AuroraBlob';
-import { fadeUp, stagger, EASE_OUT_EXPO } from '@/utils/motion';
+import { slideFromLeft, slideFromRight, stagger, EASE_OUT_EXPO } from '@/utils/motion';
 import { cn } from '@/utils/cn';
 import { useTheme } from '@/features/theme/ThemeContext';
 
@@ -92,15 +92,16 @@ interface ComparisonCardProps {
   items: ComparisonItem[];
   highlight?: boolean;
   isLight?: boolean;
+  side?: 'left' | 'right';
 }
 
-function ComparisonCard({ title, badge, tone, items, highlight = false, isLight = false }: ComparisonCardProps) {
+function ComparisonCard({ title, badge, tone, items, highlight = false, isLight = false, side = 'left' }: ComparisonCardProps) {
   // Non-highlighted competitor cards are intentionally dimmed and desaturated
   // so the eye locks onto the one HelpDesk card. The highlighted card keeps
   // full saturation, the gradient border, and the halo.
   return (
     <motion.div
-      variants={fadeUp}
+      variants={side === 'right' ? slideFromRight : slideFromLeft}
       className={cn(
         'h-full transition-all duration-500',
         !highlight && 'opacity-60 saturate-50 hover:opacity-90 hover:saturate-100',
@@ -218,7 +219,7 @@ export function MarketGapSection() {
           viewport={{ once: true, amount: 0.2 }}
           className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
         >
-          {COMPARISON_TOOLS.map((tool) => (
+          {COMPARISON_TOOLS.map((tool, i) => (
             <ComparisonCard
               key={tool.name}
               title={tool.name}
@@ -226,9 +227,10 @@ export function MarketGapSection() {
               tone={tool.tone}
               highlight={tool.highlight}
               isLight={isLight}
-              items={COMPARISON_FEATURES.map((feat, i) => ({
+              side={i < 2 ? 'left' : 'right'}
+              items={COMPARISON_FEATURES.map((feat, j) => ({
                 label: feat,
-                has: tool.features[i],
+                has: tool.features[j],
               }))}
             />
           ))}
@@ -242,10 +244,10 @@ export function MarketGapSection() {
           viewport={{ once: true, amount: 0.4 }}
           className="mt-16 grid grid-cols-3 gap-6 max-w-2xl mx-auto"
         >
-          {STATS.map((stat) => (
+          {STATS.map((stat, i) => (
             <motion.div
               key={stat.label}
-              variants={fadeUp}
+              variants={i % 2 === 0 ? slideFromLeft : slideFromRight}
               transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
               className="text-center"
             >

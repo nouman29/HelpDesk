@@ -1,26 +1,61 @@
+# =========================
+# Environment files
+# =========================
+.env
+.env.local
+.env.*.local
+*.env
+PROJECT_HANDOFF.md
+# Keep example env files
+!.env.example
+!*.env.example
+
+
+# =========================
+# Dependencies
+# =========================
+node_modules/
+
+
+# =========================
+# Build output
+# =========================
+dist/
+build/
+
+
+# =========================
+# Vite / cache
+# =========================
+.vite/
+.cache/
+
+
+# =========================
 # Logs
-logs
-*.log
+# =========================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# =========================
+# TypeScript
+# =========================
+*.tsbuildinfo
+
+
+# =========================
+# OS files
+# =========================
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-PROJECT_HANDOFF.md
-src-tree
+Thumbs.db
+
+
+# =========================
+# Editor folders
+# =========================
+.vscode/
+.idea/
+.cursor/

@@ -1,36 +1,91 @@
 import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { MagneticButton } from "@/components/animations/MagneticButton";
-import Orb from "@/components/three/Orb";
 import { HeroBackground } from "@/components/three/HeroBackground";
 import { AuroraBlob } from "@/components/animations/AuroraBlob";
 import { ROUTES } from "@/constants/routes";
-import { fadeUp, blurUp, stagger } from "@/utils/motion";
+import { slideFromLeft, blurFromLeft, stagger } from "@/utils/motion";
 import { isAuthenticated } from "@/features/auth/authStorage";
 
 export function HeroSection() {
   const navigate = useNavigate();
+  const [bgReady, setBgReady] = useState(false);
+
+  useEffect(() => {
+    // Defer WebGL canvas mount until after first paint so the page is
+    // immediately interactive (Three.js shader compilation blocks the
+    // main thread for 1-3 s on first load).
+    const hasRIC =
+      typeof window !== "undefined" && "requestIdleCallback" in window;
+    let id: number;
+    if (hasRIC) {
+      id = window.requestIdleCallback(() => setBgReady(true), {
+        timeout: 2000,
+      });
+    } else {
+      id = window.setTimeout(() => setBgReady(true), 200);
+    }
+    return () => {
+      if (hasRIC) window.cancelIdleCallback(id);
+      else window.clearTimeout(id);
+    };
+  }, []);
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-36 ">
-      {/* 3D ambient background */}
-      <HeroBackground className="absolute inset-0 -z-10" />
+      {/* Video — lowest layer */}
+      <div className="absolute inset-0 -z-30 overflow-hidden pointer-events-none bg-[#05070f]">
+        <div
+          className="
+      absolute left-1/2 top-1/2
+      aspect-video
+      w-[clamp(900px,135vw,2200px)]
+      -translate-x-1/2 -translate-y-1/2
 
-      {/* Aurora accents */}
+      sm:w-[clamp(1000px,120vw,2200px)]
+      md:w-[clamp(1100px,110vw,2200px)]
+      lg:w-[clamp(1200px,100vw,2300px)]
+      2xl:w-[min(95vw,2400px)]
+    "
+          style={{
+            maskImage:
+              "radial-gradient(ellipse 72% 62% at 50% 50%, black 0%, black 38%, rgba(0,0,0,0.85) 48%, rgba(0,0,0,0.35) 60%, transparent 74%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 72% 62% at 50% 50%, black 0%, black 38%, rgba(0,0,0,0.85) 48%, rgba(0,0,0,0.35) 60%, transparent 74%)",
+          }}
+        >
+          <video
+            className="h-full w-full object-cover"
+            autoPlay
+            muted
+            playsInline
+          >
+            <source src="/hero/helpdesk.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+
+      {/* 3D ambient background — deferred so first paint stays interactive */}
+      {bgReady && (
+        <HeroBackground className="absolute inset-0 -z-20 pointer-events-none" />
+      )}
+
+      {/* Aurora accents — above HeroBackground */}
       <AuroraBlob
-        className="left-[-180px] top-[8%] opacity-50"
+        className="left-[-180px] top-[8%] opacity-50 -z-10 pointer-events-none"
         color="#1f86ff"
         size={520}
       />
       <AuroraBlob
-        className="right-[-200px] top-[40%] opacity-40"
+        className="right-[-200px] top-[40%] opacity-40 -z-10 pointer-events-none"
         color="#8b6cff"
         size={580}
       />
       <AuroraBlob
-        className="left-1/2 bottom-[-220px] -translate-x-1/2 opacity-30"
+        className="left-1/2 bottom-[-220px] -translate-x-1/2 opacity-30 -z-10 pointer-events-none"
         color="#3ee8ff"
         size={680}
       />
@@ -44,7 +99,7 @@ export function HeroSection() {
           className="flex flex-col gap-7"
         >
           <motion.h1
-            variants={blurUp}
+            variants={blurFromLeft}
             className="text-[clamp(2.5rem,6vw,5.5rem)] font-semibold leading-[0.95] tracking-tight"
           >
             <span className="block text-gradient text-glow">Guided AI</span>
@@ -53,7 +108,7 @@ export function HeroSection() {
           </motion.h1>
 
           <motion.p
-            variants={fadeUp}
+            variants={slideFromLeft}
             className="max-w-xl text-lg md:text-xl text-secondary leading-relaxed"
           >
             Stop drowning in endless AI conversations. Help Desk guides you
@@ -62,7 +117,7 @@ export function HeroSection() {
           </motion.p>
 
           <motion.div
-            variants={fadeUp}
+            variants={slideFromLeft}
             className="flex flex-wrap items-center gap-3"
           >
             <MagneticButton strength={0.2}>
@@ -79,27 +134,10 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
 
-        {/* RIGHT — 3D orb + assistant preview */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="relative aspect-square w-full max-w-[640px] mx-auto"
-        >
-          <div className="absolute inset-0">
-            {/* React Bits "Orb" — pure ogl, no three.js / fiber. Brand
-                tints are already baked into the shader; backgroundColor
-                stays transparent-dark so the skyly app shell shows
-                through. */}
-            <Orb
-              hue={0}
-              hoverIntensity={0.35}
-              rotateOnHover
-              backgroundColor="#06080f"
-            />
-          </div>
+        {/* RIGHT  assistant preview */}
+        <div className="relative aspect-square w-full max-w-160 mx-auto">
           <HeroAssistantCard />
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -107,34 +145,25 @@ export function HeroSection() {
 
 function HeroAssistantCard() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.9, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute bottom-4 right-2 md:right-0 w-[290px] md:w-[340px] rounded-2xl glass-strong border border-white/10 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]"
-    >
+    <div className="absolute bottom-4 right-2 md:right-0 w-72.5 md:w-85 rounded-2xl glass-strong border border-white/10 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] scale-[0.72] origin-bottom-right sm:scale-[0.85] md:scale-100">
       <div className="flex items-center gap-2 mb-3">
         <div className="relative h-2.5 w-2.5">
           <span className="absolute inset-0 rounded-full bg-emerald-400" />
           <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60" />
         </div>
-        <span className="mono text-[10px] uppercase tracking-[0.25em] text-tertiary">
-          AI Assistant · live
+
+        <span className="mono text-[10px] uppercase tracking-[0.25em]  text-white">
+          AI Assistant
         </span>
       </div>
+
       <p className="text-[13px] leading-relaxed text-secondary">
         “Based on your answers, I’m narrowing the picture. Your symptoms point
         to <span className="text-primary">3 likely conclusions</span> — a few
         more questions and I’ll rank them by probability and accuracy.”
       </p>
-      <div className="mt-3 flex items-center justify-between text-[11px] text-tertiary mono">
-        <span>11 of 12 answered · 91%</span>
-        <div className="flex gap-1">
-          <span className="typing-dot" />
-          <span className="typing-dot" />
-          <span className="typing-dot" />
-        </div>
-      </div>
-    </motion.div>
+
+  
+    </div>
   );
 }

@@ -28,9 +28,10 @@ interface FlowNodeProps {
   type: NodeType;
   icon?: IconType;
   delay?: number;
+  side?: 'left' | 'right' | 'center';
 }
 
-function FlowNode({ label, type, icon: Icon, delay = 0 }: FlowNodeProps) {
+function FlowNode({ label, type, icon: Icon, delay = 0, side = 'center' }: FlowNodeProps) {
   const { theme } = useTheme();
   const isLight = theme === 'light';
 
@@ -68,10 +69,12 @@ function FlowNode({ label, type, icon: Icon, delay = 0 }: FlowNodeProps) {
       : 'text-[color:var(--accent-cyan)] font-bold',
   };
 
+  const xOffset = side === 'left' ? -40 : side === 'right' ? 40 : 0;
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.85 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, scale: 0.85, x: xOffset }}
+      whileInView={{ opacity: 1, scale: 1, x: 0 }}
       viewport={VIEWPORT_REPEAT}
       transition={{ delay, duration: 0.5, ease: EASE_OUT_EXPO }}
       whileHover={{ scale: 1.03 }}
@@ -308,6 +311,7 @@ export function AIFlowPreview() {
                 label="Your Goal"
                 icon={FiTarget}
                 delay={0.1}
+                side="center"
               />
             </div>
 
@@ -317,6 +321,7 @@ export function AIFlowPreview() {
                 label="AI Analysing"
                 icon={FiZap}
                 delay={0.3}
+                side="center"
               />
             </div>
 
@@ -325,6 +330,7 @@ export function AIFlowPreview() {
                 type="option"
                 label="Option A"
                 delay={0.5}
+                side="left"
               />
             </div>
 
@@ -333,6 +339,7 @@ export function AIFlowPreview() {
                 type="option"
                 label="Option B"
                 delay={0.6}
+                side="right"
               />
             </div>
 
@@ -341,6 +348,7 @@ export function AIFlowPreview() {
                 type="option"
                 label="Deeper A"
                 delay={0.7}
+                side="left"
               />
             </div>
 
@@ -349,6 +357,7 @@ export function AIFlowPreview() {
                 type="option"
                 label="Deeper B"
                 delay={0.8}
+                side="right"
               />
             </div>
 
@@ -358,6 +367,7 @@ export function AIFlowPreview() {
                 label="Final Decision"
                 icon={FiCheckCircle}
                 delay={0.7}
+                side="center"
               />
             </div>
           </div>

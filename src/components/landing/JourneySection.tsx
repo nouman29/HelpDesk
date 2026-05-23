@@ -12,7 +12,7 @@ import {
 import type { IconType } from 'react-icons';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { fadeUp, stagger } from '@/utils/motion';
+import { slideFromLeft, slideFromRight, stagger } from '@/utils/motion';
 
 /* ----------------------------- Data ----------------------------- */
 
@@ -97,7 +97,7 @@ export function JourneySection() {
           className="mt-20 grid lg:grid-cols-[1fr_96px_1fr] gap-6 lg:gap-4 items-stretch"
         >
           {/* --- Traditional AI Chat (chaotic) --- */}
-          <motion.div variants={fadeUp} className="h-full">
+          <motion.div variants={slideFromLeft} className="h-full">
             <GlassCard
               hover
               spotlight
@@ -143,7 +143,7 @@ export function JourneySection() {
 
           {/* --- Animated connector (scroll-driven SVG) --- */}
           <motion.div
-            variants={fadeUp}
+            variants={slideFromLeft}
             className="hidden lg:flex h-full items-stretch justify-center"
             aria-hidden
           >
@@ -151,7 +151,7 @@ export function JourneySection() {
           </motion.div>
 
           {/* --- Help Desk AI (structured) --- */}
-          <motion.div variants={fadeUp} className="h-full">
+          <motion.div variants={slideFromRight} className="h-full">
             <GlassCard
               hover
               spotlight
@@ -204,10 +204,10 @@ export function JourneySection() {
           viewport={{ once: true, amount: 0.15 }}
           className="mt-10 grid sm:grid-cols-2 gap-6"
         >
-          {problemCards.map((card) => {
+          {problemCards.map((card, i) => {
             const Icon = card.icon;
             return (
-              <motion.div key={card.title} variants={fadeUp}>
+              <motion.div key={card.title} variants={i % 2 === 0 ? slideFromLeft : slideFromRight}>
                 <GlassCard hover spotlight padding="sm" className="group">
                   <div className="flex items-start gap-3">
                     <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-[#1f86ff]/25 to-[#8b6cff]/20 border border-white/10 text-[var(--brand-300)] group-hover:text-[var(--brand-200)] transition-colors">
