@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FiMenu } from 'react-icons/fi';
+import { FiMenu, FiDownload } from 'react-icons/fi';
 import { ThemeToggle } from '@/features/theme/ThemeToggle';
 
 interface Props {
@@ -7,9 +7,22 @@ interface Props {
   step: number;
   totalSteps: number;
   onToggleSidebar: () => void;
+  chatId: number | null;
+  isDownloading: boolean;
+  onDownloadReport: () => void;
 }
 
-export function ChatHeader({ title, step, totalSteps, onToggleSidebar }: Props) {
+export function ChatHeader({
+  title,
+  step,
+  totalSteps,
+  onToggleSidebar,
+  chatId,
+  isDownloading,
+  onDownloadReport,
+}: Props) {
+  const canDownload = chatId !== null && !isDownloading;
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -35,6 +48,24 @@ export function ChatHeader({ title, step, totalSteps, onToggleSidebar }: Props) 
       </div>
 
       <div className="flex items-center gap-1">
+        <button
+          onClick={onDownloadReport}
+          disabled={!canDownload}
+          aria-label={isDownloading ? 'Generating PDF…' : 'Download report'}
+          title={chatId === null ? 'Start a chat to download a report' : 'Download report as PDF'}
+          className={[
+            'flex items-center gap-1.5 h-9 rounded-full border px-3 text-[11px] font-medium transition-all duration-200',
+            canDownload
+              ? 'glass border-white/10 text-secondary hover:text-primary hover:border-white/20 hover:bg-white/5 cursor-pointer'
+              : 'border-white/5 text-tertiary/40 cursor-not-allowed opacity-50',
+          ].join(' ')}
+        >
+          <FiDownload className={isDownloading ? 'animate-pulse' : ''} size={14} />
+          <span className="hidden sm:inline">
+            {isDownloading ? 'Generating…' : ' Download Report'}
+          </span>
+        </button>
+
         <ThemeToggle />
       </div>
     </motion.header>
