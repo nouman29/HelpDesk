@@ -10,7 +10,7 @@ import { SectionHeading } from '@/components/ui/SectionHeading';
 import { AuroraBlob } from '@/components/animations/AuroraBlob';
 import { EASE_OUT_EXPO } from '@/utils/motion';
 import { cn } from '@/utils/cn';
-import { useTheme } from '@/features/theme/ThemeContext';
+import { useTheme } from '@/features/theme/useTheme';
 
 /* ---------- Types ---------- */
 
@@ -80,7 +80,7 @@ function FlowNode({ label, type, icon: Icon, delay = 0, side = 'center' }: FlowN
       whileHover={{ scale: 1.03 }}
       aria-label={label}
       className={cn(
-        'relative w-[175px] rounded-2xl border px-4 py-3.5 transition-all duration-200',
+        'relative w-43.75 rounded-2xl border px-4 py-3.5 transition-all duration-200',
         baseByType[type],
       )}
     >
@@ -142,7 +142,7 @@ export function AIFlowPreview() {
 
         <div
           ref={wrapperRef}
-          className="relative mx-auto mt-10 w-full max-w-[820px] sm:mt-16"
+          className="relative mx-auto mt-10 w-full max-w-205 sm:mt-16"
           style={{
             height: `${DIAGRAM_HEIGHT * scale}px`,
           }}
@@ -305,7 +305,7 @@ export function AIFlowPreview() {
               />
             </motion.svg>
 
-            <div className="absolute left-1/2 top-[20px] z-10 -translate-x-1/2">
+            <div className="absolute left-1/2 top-5 z-10 -translate-x-1/2">
               <FlowNode
                 type="goal"
                 label="Your Goal"
@@ -315,7 +315,7 @@ export function AIFlowPreview() {
               />
             </div>
 
-            <div className="absolute left-1/2 top-[155px] z-10 -translate-x-1/2">
+            <div className="absolute left-1/2 top-38.75 z-10 -translate-x-1/2">
               <FlowNode
                 type="ai"
                 label="AI Analysing"
@@ -325,7 +325,7 @@ export function AIFlowPreview() {
               />
             </div>
 
-            <div className="absolute left-[32.3%] top-[330px] z-10 -translate-x-1/2">
+            <div className="absolute left-[32.3%] top-82.5 z-10 -translate-x-1/2">
               <FlowNode
                 type="option"
                 label="Option A"
@@ -334,7 +334,7 @@ export function AIFlowPreview() {
               />
             </div>
 
-            <div className="absolute left-[67.7%] top-[330px] z-10 -translate-x-1/2">
+            <div className="absolute left-[67.7%] top-82.5 z-10 -translate-x-1/2">
               <FlowNode
                 type="option"
                 label="Option B"
@@ -343,7 +343,7 @@ export function AIFlowPreview() {
               />
             </div>
 
-            <div className="absolute left-[32.3%] top-[470px] z-10 -translate-x-1/2">
+            <div className="absolute left-[32.3%] top-117.5 z-10 -translate-x-1/2">
               <FlowNode
                 type="option"
                 label="Deeper A"
@@ -352,7 +352,7 @@ export function AIFlowPreview() {
               />
             </div>
 
-            <div className="absolute left-[67.7%] top-[470px] z-10 -translate-x-1/2">
+            <div className="absolute left-[67.7%] top-117.5 z-10 -translate-x-1/2">
               <FlowNode
                 type="option"
                 label="Deeper B"
@@ -361,7 +361,7 @@ export function AIFlowPreview() {
               />
             </div>
 
-            <div className="absolute left-1/2 top-[585px] z-10 -translate-x-1/2">
+            <div className="absolute left-1/2 top-146.25 z-10 -translate-x-1/2">
               <FlowNode
                 type="final"
                 label="Final Decision"

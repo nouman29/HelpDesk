@@ -12,10 +12,10 @@ export function RouteFallback() {
       >
         <div className="relative h-14 w-14">
           <div className="absolute inset-0 rounded-full border border-white/10" />
-          <div className="absolute inset-0 rounded-full border-t border-[var(--brand-400)] animate-spin" />
-          <div className="absolute inset-3 rounded-full bg-[var(--brand-500)]/30 blur-md" />
+          <div className="absolute inset-0 rounded-full border-t border-(--brand-400) animate-spin" />
+          <div className="absolute inset-3 rounded-full bg-(--brand-500)/30 blur-md" />
         </div>
-        <p className="mono text-xs tracking-[0.25em] text-[var(--text-3)] uppercase">
+        <p className="mono text-xs tracking-[0.25em] text-(--text-3) uppercase">
           Initializing
         </p>
       </motion.div>

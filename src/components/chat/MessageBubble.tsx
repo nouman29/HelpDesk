@@ -43,7 +43,7 @@ export function MessageBubble({ message, index }: Props) {
         className={cn(
           'max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-[0_8px_30px_-15px_rgba(0,0,0,0.4)]',
           isUser
-            ? 'bg-gradient-to-br from-[#1f86ff] to-[#4aa6ff] text-white'
+            ? 'bg-linear-to-br from-[#1f86ff] to-[#4aa6ff] text-white'
             : 'glass border border-white/10 text-secondary',
         )}
       >
@@ -59,7 +59,7 @@ export function MessageBubble({ message, index }: Props) {
       </div>
       {isUser && (
         <div className="shrink-0 mt-1">
-          <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[#1f86ff] to-[#8b6cff] text-white">
+          <div className="grid h-8 w-8 place-items-center rounded-xl bg-linear-to-br from-[#1f86ff] to-[#8b6cff] text-white">
             <FiUser size={14} />
           </div>
         </div>

@@ -20,9 +20,6 @@ export default function RecentChatsPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isLgUp = useMediaQuery('(min-width: 1024px)');
 
-  useEffect(() => {
-    if (isLgUp) setSidebarOpen(false);
-  }, [isLgUp]);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +58,7 @@ export default function RecentChatsPage() {
     );
   }, [chats, query]);
 
+  const mobileSidebarOpen = !isLgUp && sidebarOpen;
   const hasActiveQuery = query.trim().length > 0;
 
   const openChat = (chatId: number) => {
@@ -80,7 +78,7 @@ export default function RecentChatsPage() {
 
           {/* Mobile sidebar drawer */}
           <AnimatePresence>
-            {!isLgUp && sidebarOpen && (
+            {mobileSidebarOpen && (
               <>
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -123,7 +121,7 @@ export default function RecentChatsPage() {
                 >
                   <FiMenu />
                 </button>
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full glass border border-white/10 text-[var(--brand-300)]">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full glass border border-white/10 text-(--brand-300)">
                   <FiClock />
                 </div>
                 <div>
@@ -195,7 +193,7 @@ export default function RecentChatsPage() {
                       </p>
                       <button
                         onClick={() => navigate(ROUTES.CHAT)}
-                        className="group inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white bg-gradient-to-br from-[#1f86ff] to-[#8b6cff] shadow-[0_10px_30px_-10px_rgba(31,134,255,0.6)] btn-glow"
+                        className="group inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white bg-linear-to-br from-[#1f86ff] to-[#8b6cff] shadow-[0_10px_30px_-10px_rgba(31,134,255,0.6)] btn-glow"
                       >
                         <FiPlus />
                         <span>Start the chat</span>
@@ -240,7 +238,7 @@ export default function RecentChatsPage() {
                                 e.currentTarget.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
                               }}
                             >
-                              <div className="pointer-events-none absolute -top-20 -right-16 h-48 w-48 rounded-full bg-gradient-to-br from-sky-500/30 to-blue-700/0 blur-3xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
+                              <div className="pointer-events-none absolute -top-20 -right-16 h-48 w-48 rounded-full bg-linear-to-br from-sky-500/30 to-blue-700/0 blur-3xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
                               <div className="relative flex items-start justify-between gap-3">
                                 <div className="min-w-0 flex-1">
                                   <h4 className="font-semibold text-primary line-clamp-2">
@@ -253,7 +251,7 @@ export default function RecentChatsPage() {
                                   {/* Progress bar */}
                                   <div className="mt-3 h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
                                     <div
-                                      className="h-full rounded-full bg-gradient-to-r from-[#1f86ff] to-[#8b6cff] transition-all duration-500"
+                                      className="h-full rounded-full bg-linear-to-r from-[#1f86ff] to-[#8b6cff] transition-all duration-500"
                                       style={{ width: `${pct}%` }}
                                     />
                                   </div>
@@ -261,7 +259,7 @@ export default function RecentChatsPage() {
                                     {pct}% complete
                                   </p>
                                 </div>
-                                <FiArrowUpRight className="shrink-0 text-tertiary group-hover:text-[var(--brand-300)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
+                                <FiArrowUpRight className="shrink-0 text-tertiary group-hover:text-(--brand-300) group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
                               </div>
                             </button>
                           </motion.li>

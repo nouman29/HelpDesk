@@ -86,7 +86,7 @@ export default function SignupPage() {
               Already on HelpDesk?{' '}
               <button
                 type="button"
-                className="link-anim text-[var(--brand-300)]"
+                className="link-anim text-(--brand-300)"
                 onClick={() => navigate(ROUTES.LOGIN)}
               >
                 Sign in

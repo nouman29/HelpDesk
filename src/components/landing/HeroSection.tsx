@@ -145,7 +145,7 @@ export function HeroSection() {
 
 function HeroAssistantCard() {
   return (
-    <div className="absolute bottom-16 right-[-20px] md:right-[-50px] lg:right-[-90px] w-72.5 md:w-85 rounded-2xl glass-strong border border-white/10 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] scale-[0.72] origin-bottom-right sm:scale-[0.85] md:scale-100">
+    <div className="absolute bottom-16 -right-5 md:-right-12.5 lg:-right-22.5 w-72.5 md:w-85 rounded-2xl glass-strong border border-white/10 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] scale-[0.72] origin-bottom-right sm:scale-[0.85] md:scale-100">  
       <div className="flex items-center gap-2 mb-3">
         <div className="relative h-2.5 w-2.5">
           <span className="absolute inset-0 rounded-full bg-emerald-400" />

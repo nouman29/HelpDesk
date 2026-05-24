@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSun, FiMoon } from 'react-icons/fi';
-import { useTheme } from './ThemeContext';
+import { useTheme } from './useTheme';
 import { cn } from '@/utils/cn';
 
 interface Props { className?: string; }
@@ -31,8 +31,8 @@ export function ThemeToggle({ className }: Props) {
           className="absolute inset-0 grid place-items-center"
         >
           {isDark
-            ? <FiMoon className="text-[var(--brand-200)]" size={15} />
-            : <FiSun  className="text-amber-400"          size={15} />}
+            ? <FiMoon className="text-(--brand-200)" size={15} />
+            : <FiSun  className="text-amber-400"  size={15} />}
         </motion.span>
       </AnimatePresence>
     </button>

@@ -12,7 +12,7 @@ export default function NotFoundPage() {
     <motion.div variants={pageTransition} initial="initial" animate="enter" exit="exit">
       <BareLayout>
         <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-          <p className="mono text-[10px] uppercase tracking-[0.3em] text-[var(--brand-300)]">404</p>
+          <p className="mono text-[10px] uppercase tracking-[0.3em] text-(--brand-300)">404</p>
           <h1 className="mt-4 text-6xl md:text-8xl font-semibold tracking-tight">
             <span className="text-gradient">Off the path.</span>
           </h1>

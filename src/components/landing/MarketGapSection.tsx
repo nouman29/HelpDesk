@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { AuroraBlob } from '@/components/animations/AuroraBlob';
 import { slideFromLeft, slideFromRight, stagger, EASE_OUT_EXPO } from '@/utils/motion';
 import { cn } from '@/utils/cn';
-import { useTheme } from '@/features/theme/ThemeContext';
+import { useTheme } from '@/features/theme/useTheme';
 
 /* ---------- Data ----------
  *
@@ -116,13 +116,13 @@ function ComparisonCard({ title, badge, tone, items, highlight = false, isLight 
           'h-full flex flex-col gap-4',
           highlight
             ? 'shadow-[0_30px_80px_-30px_rgba(31,134,255,0.45)] border-white/15'
-            : 'border-white/5 bg-white/[0.015]',
+            : 'border-white/5 bg-white/1.5',
         )}
       >
         {highlight && (
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-gradient-to-br from-[#1f86ff]/35 to-[#8b6cff]/0 blur-3xl opacity-80"
+            className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-linear-to-br from-[#1f86ff]/35 to-[#8b6cff]/0 blur-3xl opacity-80"
           />
         )}
 
@@ -158,7 +158,7 @@ function ComparisonCard({ title, badge, tone, items, highlight = false, isLight 
                   it.has && highlight
                     ? isLight
                       ? 'border-green-600/60 bg-green-600 text-green-100'
-                      : 'border-[color:var(--accent-cyan)]/40 bg-[color:var(--accent-cyan)]/10 text-[color:var(--accent-cyan)]'
+                      : 'border-(--accent-cyan)/40 bg-(--accent-cyan)/10 text-(--accent-cyan)'
                     : it.has
                       ? 'border-white/15 bg-white/5 text-secondary'
                       : isLight
@@ -196,11 +196,11 @@ export function MarketGapSection() {
   return (
     <section
       id="why-helpdesk"
-      className="relative py-32 overflow-hidden bg-gradient-to-b from-black/30 to-transparent"
+      className="relative py-32 overflow-hidden bg-linear-to-b from-black/30 to-transparent"
     >
       {/* Background accent — matches the aurora pattern from the other landing sections */}
       <AuroraBlob
-        className="right-[-100px] top-1/2 -translate-y-1/2 opacity-30"
+        className="-right-25 top-1/2 -translate-y-1/2 opacity-30"
         color="#3ee8ff"
         size={420}
       />

@@ -42,7 +42,7 @@ export function AnswerOptions({ options, disabled = false, onSelect }: Props) {
             'px-4 py-3 transition-all duration-300 spotlight',
             disabled
               ? 'opacity-50 cursor-not-allowed'
-              : 'hover:border-[var(--border-glow)] hover:-translate-y-0.5 cursor-pointer',
+              : 'hover:border-(--border-glow) hover:-translate-y-0.5 cursor-pointer',
           ].join(' ')}
           role="option"
           aria-selected={false}
@@ -52,7 +52,7 @@ export function AnswerOptions({ options, disabled = false, onSelect }: Props) {
               {option}
             </span>
             <FiArrowUpRight
-              className="shrink-0 text-tertiary group-hover:text-[var(--brand-300)] transition-colors"
+              className="shrink-0 text-tertiary group-hover:text-(--brand-300) transition-colors"
               size={14}
             />
           </div>

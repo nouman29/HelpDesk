@@ -12,7 +12,7 @@ export function CinematicWipe({ active }: Props) {
       {active && (
         <motion.div
           key="wipe"
-          className="fixed inset-0 z-[100] pointer-events-none"
+          className="fixed inset-0 z-100 pointer-events-none"
           initial="hidden"
           animate="show"
           exit="exit"
@@ -56,7 +56,7 @@ export function CinematicWipe({ active }: Props) {
             animate={{ opacity: [0, 1, 0], scale: [0.6, 1.3, 0.8] }}
             transition={{ duration: 0.8, times: [0, 0.4, 1] }}
           >
-            <div className="h-20 w-20 rounded-full bg-[var(--brand-400)]/30 blur-2xl" />
+            <div className="h-20 w-20 rounded-full bg-(--brand-400)/30 blur-2xl" />
             <div className="absolute inset-0 m-auto h-3 w-3 rounded-full bg-white" />
           </motion.div>
         </motion.div>

@@ -109,7 +109,6 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
       setLoading(false);
       return;
     }
-    if (!silent) setLoading(true);
     try {
       const data = await getMyChats(token);
       setChats(Array.isArray(data) ? data : []);

@@ -36,7 +36,7 @@ export function AuthShell({ side, title, subtitle, children }: Props) {
           className={`flex items-center justify-center px-6 py-24 md:py-28 ${side === 'right' ? 'lg:order-2' : ''}`}
         >
           <div className="w-full max-w-md">
-            <p className="mono text-[10px] uppercase tracking-[0.3em] text-[var(--brand-300)]">
+            <p className="mono text-[10px] uppercase tracking-[0.3em] text-(--brand-300)">
               {side === 'left' ? 'Sign up — 01' : 'Sign in — 02'}
             </p>
             <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight">
@@ -70,8 +70,8 @@ function AuthVisual({ side }: { side: 'left' | 'right' }) {
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
-        <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1f86ff]/30 via-transparent to-[#8b6cff]/30 mix-blend-overlay" />
+        <div className="absolute inset-0 bg-linear-to-tr from-black/80 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-br from-[#1f86ff]/30 via-transparent to-[#8b6cff]/30 mix-blend-overlay" />
 
         {/* HUD lines */}
         <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full mix-blend-screen opacity-60">

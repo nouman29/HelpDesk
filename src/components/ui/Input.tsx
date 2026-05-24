@@ -24,11 +24,11 @@ export const Input = forwardRef<HTMLInputElement, Props>(function Input(
         className={cn(
           'group relative flex items-center gap-3 rounded-xl px-4',
           'glass border border-white/10 transition-all duration-300',
-          'focus-within:border-[var(--brand-400)]/60 focus-within:shadow-[0_0_0_4px_rgba(74,166,255,0.10)]',
+          'focus-within:border-(--brand-400)/60 focus-within:shadow-[0_0_0_4px_rgba(74,166,255,0.10)]',
           error && 'border-rose-400/60',
         )}
       >
-        {leftIcon && <span className="text-tertiary group-focus-within:text-[var(--brand-300)] transition-colors">{leftIcon}</span>}
+        {leftIcon && <span className="text-tertiary group-focus-within:text-(--brand-300) transition-colors">{leftIcon}</span>}
         <input
           ref={ref}
           id={fieldId}

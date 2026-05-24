@@ -58,7 +58,7 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-between text-xs">
               <label className="flex items-center gap-2 text-tertiary">
-                <input type="checkbox" defaultChecked className="accent-[var(--brand-500)]" />
+                <input type="checkbox" defaultChecked className="accent-(--brand-500)" />
                 Remember me
               </label>
             </div>
@@ -76,7 +76,7 @@ export default function LoginPage() {
               New to HelpDesk?{' '}
               <button
                 type="button"
-                className="link-anim text-[var(--brand-300)]"
+                className="link-anim text-(--brand-300)"
                 onClick={() => navigate(ROUTES.SIGNUP)}
               >
                 Create an account

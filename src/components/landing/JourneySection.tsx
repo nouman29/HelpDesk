@@ -111,7 +111,7 @@ export function JourneySection() {
               {/* red overlay */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-rose-500/12 via-rose-500/4 to-transparent"
+                className="pointer-events-none absolute inset-0 rounded-2xl bg-linear-to-br from-rose-500/12 via-rose-500/4 to-transparent"
               />
               <div className="relative flex items-start gap-3">
                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-500/15 border border-rose-400/30 text-rose-300">
@@ -136,7 +136,7 @@ export function JourneySection() {
               {/* Bottom fade-out — softens the last bubble into the card bg */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-gradient-to-t from-[var(--bg-1)] via-[var(--bg-1)]/60 to-transparent"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-linear-to-t from-(--bg-1) via-(--bg-1)/60 to-transparent"
               />
             </GlassCard>
           </motion.div>
@@ -165,7 +165,7 @@ export function JourneySection() {
               {/* green overlay */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/12 via-emerald-500/4 to-transparent"
+                className="pointer-events-none absolute inset-0 rounded-2xl bg-linear-to-br from-emerald-500/12 via-emerald-500/4 to-transparent"
               />
               <div className="relative flex items-start gap-3">
                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300">
@@ -190,7 +190,7 @@ export function JourneySection() {
               {/* Bottom fade-out — softens the last step into the card bg */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-gradient-to-t from-[var(--bg-1)] via-[var(--bg-1)]/60 to-transparent"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-linear-to-t from-(--bg-1) via-(--bg-1)/60 to-transparent"
               />
             </GlassCard>
           </motion.div>
@@ -210,7 +210,7 @@ export function JourneySection() {
               <motion.div key={card.title} variants={i % 2 === 0 ? slideFromLeft : slideFromRight}>
                 <GlassCard hover spotlight padding="sm" className="group">
                   <div className="flex items-start gap-3">
-                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-[#1f86ff]/25 to-[#8b6cff]/20 border border-white/10 text-[var(--brand-300)] group-hover:text-[var(--brand-200)] transition-colors">
+                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-linear-to-br from-[#1f86ff]/25 to-[#8b6cff]/20 border border-white/10 text-(--brand-300) group-hover:text-(--brand-200) transition-colors">
                       <Icon size={14} />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -220,7 +220,7 @@ export function JourneySection() {
                         </h4>
                         <FiArrowRight
                           size={13}
-                          className="shrink-0 text-tertiary group-hover:text-[var(--brand-300)] group-hover:translate-x-0.5 transition-all"
+                          className="shrink-0 text-tertiary group-hover:text-(--brand-300) group-hover:translate-x-0.5 transition-all"
                         />
                       </div>
                       <p className="mt-0.5 text-[13px] text-secondary leading-snug">
@@ -257,7 +257,7 @@ function ScrollConnector({ lineLength }: ScrollConnectorProps) {
     <svg
       viewBox="0 0 80 520"
       preserveAspectRatio="none"
-      className="h-full w-[80px]"
+      className="h-full w-20"
     >
       <defs>
         <linearGradient id="journey-connector-grad" x1="0" y1="0" x2="0" y2="1">
@@ -312,7 +312,7 @@ function ChaosBubble({ who, text }: { who: 'you' | 'ai'; text: string }) {
         className={[
           'max-w-[85%] rounded-2xl px-3.5 py-2 text-[13px] leading-relaxed',
           isYou
-            ? 'bg-gradient-to-br from-[#1f86ff]/80 to-[#4aa6ff]/70 text-white'
+            ? 'bg-linear-to-br from-[#1f86ff]/80 to-[#4aa6ff]/70 text-white'
             : 'glass border border-white/10 text-secondary',
         ].join(' ')}
       >

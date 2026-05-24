@@ -1,14 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { storage } from '@/utils/storage';
 import type { ThemeMode } from '@/types';
+import { ThemeContext, type ThemeContextValue } from './context';
 
-interface ThemeContextValue {
-  theme: ThemeMode;
-  toggle: () => void;
-  setTheme: (m: ThemeMode) => void;
-}
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = 'hd:theme';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -34,10 +28,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
-}
-
-export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error('useTheme must be used inside <ThemeProvider>');
-  return ctx;
 }

@@ -16,9 +16,10 @@ interface Props { transparent?: boolean; }
 export function Navbar({ transparent = true }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [authed, setAuthed] = useState<boolean>(() => isAuthenticated());
+  const [, setAuthVersion] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const authed = isAuthenticated();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -27,14 +28,12 @@ export function Navbar({ transparent = true }: Props) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Re-check auth on every route change (covers login/signup/logout flows)
-  // and on cross-tab storage changes.
+  // Re-check auth on cross-tab storage changes and full storage clears.
   useEffect(() => {
-    setAuthed(isAuthenticated());
-  }, [location.pathname]);
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'hd:auth_token' || e.key === null) setAuthed(isAuthenticated());
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === 'hd:auth_token' || event.key == null) {
+        setAuthVersion((version) => version + 1);
+      }
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
@@ -42,7 +41,6 @@ export function Navbar({ transparent = true }: Props) {
 
   const handleLogout = () => {
     clearAuth();
-    setAuthed(false);
     navigate(ROUTES.LOGIN);
   };
 
