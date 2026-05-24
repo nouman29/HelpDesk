@@ -36,8 +36,13 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-36 ">
-      {/* Video — lowest layer */}
-      <div className="absolute inset-0 -z-30 overflow-hidden pointer-events-none bg-[#05070f]">
+      
+      {bgReady && (
+        <HeroBackground className="absolute inset-0 -z-30 pointer-events-none" />
+      )}
+
+      {/* New  video — above 3D ambient */}
+      <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
         <div
           className="
       absolute left-1/2 top-1/2
@@ -68,24 +73,19 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* 3D ambient background — deferred so first paint stays interactive */}
-      {bgReady && (
-        <HeroBackground className="absolute inset-0 -z-20 pointer-events-none" />
-      )}
-
       {/* Aurora accents — above HeroBackground */}
       <AuroraBlob
-        className="left-[-180px] top-[8%] opacity-50 -z-10 pointer-events-none"
+        className="-left-45 top-[8%] opacity-50 -z-10 pointer-events-none"
         color="#1f86ff"
         size={520}
       />
       <AuroraBlob
-        className="right-[-200px] top-[40%] opacity-40 -z-10 pointer-events-none"
+        className="right-50 top-[40%] opacity-40 -z-10 pointer-events-none"
         color="#8b6cff"
         size={580}
       />
       <AuroraBlob
-        className="left-1/2 bottom-[-220px] -translate-x-1/2 opacity-30 -z-10 pointer-events-none"
+        className="left-1/2 -bottom-55 -translate-x-1/2 opacity-30 -z-10 pointer-events-none"
         color="#3ee8ff"
         size={680}
       />
@@ -145,14 +145,14 @@ export function HeroSection() {
 
 function HeroAssistantCard() {
   return (
-    <div className="absolute bottom-4 right-2 md:right-0 w-72.5 md:w-85 rounded-2xl glass-strong border border-white/10 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] scale-[0.72] origin-bottom-right sm:scale-[0.85] md:scale-100">
+    <div className="absolute bottom-16 right-[-20px] md:right-[-50px] lg:right-[-90px] w-72.5 md:w-85 rounded-2xl glass-strong border border-white/10 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] scale-[0.72] origin-bottom-right sm:scale-[0.85] md:scale-100">
       <div className="flex items-center gap-2 mb-3">
         <div className="relative h-2.5 w-2.5">
           <span className="absolute inset-0 rounded-full bg-emerald-400" />
           <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60" />
         </div>
 
-        <span className="mono text-[10px] uppercase tracking-[0.25em]  text-white">
+        <span className="mono text-[10px] uppercase tracking-[0.25em] text-white">
           AI Assistant
         </span>
       </div>
@@ -162,8 +162,6 @@ function HeroAssistantCard() {
         to <span className="text-primary">3 likely conclusions</span> — a few
         more questions and I’ll rank them by probability and accuracy.”
       </p>
-
-  
     </div>
   );
 }
