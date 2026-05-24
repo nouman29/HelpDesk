@@ -32,6 +32,7 @@ import {
 import { showErrorToast } from '@/utils/toast';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { requestChatListRefresh } from '@/features/chat/chatListRefresh';
+import { downloadChatReport } from '@/utils/downloadChatReport';
 
 const THINKING_PLACEHOLDER: ChatMessage = {
   id: 'thinking',
@@ -73,6 +74,7 @@ export default function ChatPage() {
     percentage: number;
   } | null>(null);
   const [conclusions, setConclusions] = useState<Conclusion[]>([]);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   /* ----------------------- Helpers ----------------------- */
 
@@ -388,6 +390,21 @@ export default function ChatPage() {
     }
   };
 
+  /* ----------------------- Download report ----------------------- */
+
+  const handleDownloadReport = async () => {
+    const token = getToken();
+    if (!token || chatId === null) return;
+    setIsDownloading(true);
+    try {
+      await downloadChatReport({ token, chatId });
+    } catch (err) {
+      showErrorToast(err, 'chat');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   /* ----------------------- Render ----------------------- */
 
   // Find the latest AI message with unanswered options to render the option grid under.
@@ -461,6 +478,9 @@ export default function ChatPage() {
               step={step}
               totalSteps={totalSteps}
               onToggleSidebar={() => setSidebarOpen(true)}
+              chatId={chatId}
+              isDownloading={isDownloading}
+              onDownloadReport={handleDownloadReport}
             />
 
             <div
