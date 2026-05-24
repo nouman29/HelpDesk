@@ -162,12 +162,11 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
 
       <button
         onClick={onNewJourney}
-        className="group relative inline-flex items-center justify-between gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white bg-gradient-to-br from-[#1f86ff] to-[#8b6cff] shadow-[0_10px_30px_-10px_rgba(31,134,255,0.6)] btn-glow"
+        className="group relative inline-flex items-center justify-between gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white bg-linear-to-br from-[#1f86ff] to-[#8b6cff] shadow-[0_10px_30px_-10px_rgba(31,134,255,0.6)] btn-glow"
       >
         <span className="inline-flex items-center gap-2">
           <FiPlus /> New Decision Journey
         </span>
-        <span className="mono text-[10px] uppercase tracking-[0.2em] opacity-80">⌘N</span>
       </button>
 
       <button
@@ -177,13 +176,12 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
         <span className="inline-flex items-center gap-2">
           <FiClock /> Recent Chats
         </span>
-        <span className="mono text-[10px] uppercase text-tertiary">all</span>
       </button>
 
       {/* Theme-aware divider — uses the soft border token so it auto-flips
           between dark and light themes (rgba(255,255,255,0.08) in dark,
           rgba(10,20,40,0.08) in light). */}
-      <hr className="border-0 h-px bg-[var(--border-soft)] my-1" />
+      <hr className="border-0 h-px bg-(--border-soft) my-1" />
 
       <div className="flex items-center justify-between mt-2 px-1">
         <span className="mono text-[10px] uppercase tracking-[0.25em] text-tertiary">Recent</span>
@@ -238,7 +236,7 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
         )}
       </nav>
 
-      <div className="border-t border-[var(--border-soft)] pt-3 flex flex-col gap-1">
+      <div className="border-t border-(--border-soft) pt-3 flex flex-col gap-1">
         <SidebarItem
           icon={<FiLogOut />}
           label="Logout"

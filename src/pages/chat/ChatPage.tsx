@@ -58,9 +58,6 @@ export default function ChatPage() {
   const isLgUp = useMediaQuery('(min-width: 1024px)');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (isLgUp) setSidebarOpen(false);
-  }, [isLgUp]);
 
   const [phase, setPhase] = useState<Phase>('bootstrapping');
   const [initialQueue, setInitialQueue] = useState<InitialQuestion[]>([]);
