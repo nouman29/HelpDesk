@@ -18,5 +18,11 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Data-fetching in useEffect is a legitimate pattern; the React Compiler
+      // rule fires on any function that transitively calls setState, which is
+      // overly broad for async fetch helpers.
+      'react-hooks/set-state-in-effect': 'off',
+    },
   },
 ])
