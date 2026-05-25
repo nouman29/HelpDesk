@@ -1,21 +1,12 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
 
-// Global handle so anything (Navbar, Footer, deep links) can drive
-// smooth scrolling without prop-drilling a context.
 declare global {
   interface Window {
     __lenis?: Lenis;
   }
 }
 
-/**
- * Inertial / smooth scrolling. Mounts a single Lenis instance globally
- * and exposes it on `window.__lenis` so callers can do
- *   window.__lenis?.scrollTo('#problem')
- * which keeps Lenis' internal scroll position in sync (native anchor
- * jumps otherwise desync it and "freeze" the wheel).
- */
 export function useLenis() {
   useEffect(() => {
     const isCoarse = window.matchMedia('(pointer: coarse)').matches;
@@ -35,9 +26,6 @@ export function useLenis() {
     };
     rafId = requestAnimationFrame(raf);
 
-    // Re-sync Lenis when the tab regains focus or the viewport resizes —
-    // these are the conditions where the internal cache and the real
-    // scroll position can drift.
     const onFocus  = () => lenis.resize();
     const onResize = () => lenis.resize();
     window.addEventListener('focus',  onFocus);
@@ -53,10 +41,6 @@ export function useLenis() {
   }, []);
 }
 
-/**
- * Smoothly scroll to a section target.
- * `target` can be a CSS selector ('#problem'), 0 (top), or an element.
- */
 export function lenisScrollTo(target: string | number | HTMLElement) {
   const lenis = window.__lenis;
   if (lenis) {

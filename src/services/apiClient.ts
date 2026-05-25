@@ -1,14 +1,3 @@
-/**
- * Tiny typed fetch wrapper for the AI HelpDesk backend.
- *
- * Responsibilities:
- *  - Resolve the base URL from VITE_API_BASE_URL.
- *  - Send JSON Content-Type by default.
- *  - Parse the standard `{ status, message, data }` envelope.
- *  - Throw an Error when status === "ERROR" (or HTTP is not OK), with the
- *    backend's `message` so the UI can surface it to the user.
- */
-
 export const API_BASE_URL: string =
   (import.meta.env?.VITE_API_BASE_URL as string | undefined) ?? 'http://localhost:5000';
 

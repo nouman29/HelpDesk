@@ -15,9 +15,6 @@ export function HeroSection() {
   const [bgReady, setBgReady] = useState(false);
 
   useEffect(() => {
-    // Defer WebGL canvas mount until after first paint so the page is
-    // immediately interactive (Three.js shader compilation blocks the
-    // main thread for 1-3 s on first load).
     const hasRIC =
       typeof window !== "undefined" && "requestIdleCallback" in window;
     let id: number;
@@ -41,7 +38,6 @@ export function HeroSection() {
         <HeroBackground className="absolute inset-0 -z-30 pointer-events-none" />
       )}
 
-      {/* New  video — above 3D ambient */}
       <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
         <div
           className="
@@ -73,7 +69,6 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Aurora accents — above HeroBackground */}
       <AuroraBlob
         className="-left-45 top-[8%] opacity-50 -z-10 pointer-events-none"
         color="#1f86ff"
@@ -91,7 +86,6 @@ export function HeroSection() {
       />
 
       <div className="mx-auto w-full max-w-7xl px-6 grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
-        {/* LEFT — copy */}
         <motion.div
           variants={stagger(0.1, 0.2)}
           initial="hidden"
@@ -134,7 +128,6 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
 
-        {/* RIGHT  assistant preview */}
         <div className="relative aspect-square w-full max-w-160 mx-auto">
           <HeroAssistantCard />
         </div>

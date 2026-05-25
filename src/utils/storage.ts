@@ -1,4 +1,3 @@
-/** Tiny typed wrapper over localStorage. */
 export const storage = {
   get<T>(key: string, fallback: T): T {
     try {

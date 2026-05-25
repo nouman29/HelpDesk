@@ -28,7 +28,6 @@ export function Navbar({ transparent = true }: Props) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Re-check auth on cross-tab storage changes and full storage clears.
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
       if (event.key === 'hd:auth_token' || event.key == null) {
@@ -44,14 +43,12 @@ export function Navbar({ transparent = true }: Props) {
     navigate(ROUTES.LOGIN);
   };
 
-  /** Route OR anchor — routed through Lenis so the page doesn't freeze. */
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     if (isRouteHref(href)) {
       e.preventDefault();
       navigate(href);
       return;
     }
-    // In-page anchor. If we're not on the landing page, go there first.
     e.preventDefault();
     if (location.pathname !== ROUTES.LANDING) {
       navigate(`${ROUTES.LANDING}${href}`);
@@ -83,10 +80,6 @@ export function Navbar({ transparent = true }: Props) {
           <nav className="hidden md:flex items-center gap-1">
             {PRIMARY_NAV.map((item, i) => {
               const prev = PRIMARY_NAV[i - 1];
-              // Insert a fading vertical separator at the boundary between
-              // in-page anchor items (#...) and route items (/...). With
-              // the current PRIMARY_NAV this naturally lands right after
-              // "Why HelpDesk", before "Chat".
               const needsSeparator =
                 prev && !isRouteHref(prev.href) && isRouteHref(item.href);
 
@@ -126,7 +119,6 @@ export function Navbar({ transparent = true }: Props) {
 
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle className="hidden sm:inline-flex" />
-            {/* Vertical separator between the nav cluster and the auth button. */}
             <NavSeparator className="hidden sm:inline-block" />
             {authed ? (
               <Button
@@ -204,11 +196,6 @@ export function Navbar({ transparent = true }: Props) {
   );
 }
 
-/**
- * A thin vertical separator whose top and bottom ends fade to
- * transparent. Used to group the navbar's anchor links apart from the
- * route links, and to set the auth button off from the nav cluster.
- */
 function NavSeparator({ className }: { className?: string }) {
   return (
     <span

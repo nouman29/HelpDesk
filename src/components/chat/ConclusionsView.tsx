@@ -10,13 +10,6 @@ interface Props {
   className?: string;
 }
 
-/**
- * Renders the final conclusions returned by `/conclude-chat` (or already
- * present on a restored chat via `/get-chat`). Each conclusion gets a
- * card with title, description, and the two percentage metrics
- * (probability + accuracy). The trailing CTA lets the user kick off a
- * brand-new decision journey.
- */
 export function ConclusionsView({ conclusions, onStartAnother, className }: Props) {
   const safe = Array.isArray(conclusions) ? conclusions : [];
 

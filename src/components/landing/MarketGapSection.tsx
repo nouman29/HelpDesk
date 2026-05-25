@@ -8,14 +8,6 @@ import { slideFromLeft, slideFromRight, stagger, EASE_OUT_EXPO } from '@/utils/m
 import { cn } from '@/utils/cn';
 import { useTheme } from '@/features/theme/useTheme';
 
-/* ---------- Data ----------
- *
- * No `@/data/comparison` module exists in this project; the snippet's data
- * is defined inline here so the section stays self-contained. Order of
- * features is shared across every column — flip a boolean in `features`
- * to toggle a check/cross.
- */
-
 const COMPARISON_FEATURES = [
   'Structured decision flow',
   'Multiple-choice guided Q/A',
@@ -33,9 +25,7 @@ interface Tool {
   name: string;
   badge: string;
   tone: BadgeTone;
-  /** Same length / order as COMPARISON_FEATURES. */
   features: boolean[];
-  /** If true, the card is rendered with the brand-gradient halo. */
   highlight?: boolean;
 }
 
@@ -73,13 +63,6 @@ const STATS: { value: string; label: string; color: string }[] = [
   { value: '0',   label: 'Endless chat loops',        color: 'text-[color:var(--accent-mint)]' },
 ];
 
-/* ---------- ComparisonCard ----------
- *
- * Mirrors the snippet's ComparisonCard API but built from project
- * primitives (GlassCard + Badge + brand tokens). Highlighted variant
- * adds a gradientBorder + a soft halo to draw the eye to HelpDesk.
- */
-
 interface ComparisonItem {
   label: string;
   has: boolean;
@@ -96,9 +79,6 @@ interface ComparisonCardProps {
 }
 
 function ComparisonCard({ title, badge, tone, items, highlight = false, isLight = false, side = 'left' }: ComparisonCardProps) {
-  // Non-highlighted competitor cards are intentionally dimmed and desaturated
-  // so the eye locks onto the one HelpDesk card. The highlighted card keeps
-  // full saturation, the gradient border, and the halo.
   return (
     <motion.div
       variants={side === 'right' ? slideFromRight : slideFromLeft}
@@ -187,8 +167,6 @@ function ComparisonCard({ title, badge, tone, items, highlight = false, isLight 
   );
 }
 
-/* ---------- Section ---------- */
-
 export function MarketGapSection() {
   const { theme } = useTheme();
   const isLight = theme === 'light';
@@ -198,7 +176,6 @@ export function MarketGapSection() {
       id="why-helpdesk"
       className="relative py-32 overflow-hidden bg-linear-to-b from-black/30 to-transparent"
     >
-      {/* Background accent — matches the aurora pattern from the other landing sections */}
       <AuroraBlob
         className="-right-25 top-1/2 -translate-y-1/2 opacity-30"
         color="#3ee8ff"

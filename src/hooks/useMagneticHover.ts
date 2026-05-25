@@ -1,9 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-/**
- * Attaches a subtle "magnetic" pull effect to an element on mouse hover.
- * Returns a ref to attach to your target element.
- */
 export function useMagneticHover<T extends HTMLElement>(strength = 0.25) {
   const ref = useRef<T | null>(null);
 

@@ -1,7 +1,5 @@
 import { apiRequest } from './apiClient';
 
-/* ---------------------- Types ---------------------- */
-
 export interface InitialQuestion {
   id: number;
   title: string;
@@ -62,8 +60,6 @@ export interface GetChatResponse {
   chat_conclusions?: Conclusion[];
 }
 
-/* --------------------- Endpoints --------------------- */
-
 export function getInitialQuestions(): Promise<InitialQuestion[]> {
   return apiRequest<InitialQuestion[]>('/get_initial_questions');
 }
@@ -86,11 +82,6 @@ export function sendAnswer(
   });
 }
 
-/**
- * Conclude the chat once the completion percentage has crossed the
- * configured threshold. The response is the final list of conclusions
- * (diagnoses, recommendations, etc.) returned by the backend.
- */
 export function concludeChat(
   token: string,
   chatId: number,

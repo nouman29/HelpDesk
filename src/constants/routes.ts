@@ -1,7 +1,3 @@
-/**
- * Centralized route definitions.
- * All navigation across the app should reference these constants.
- */
 export const ROUTES = {
   LANDING: '/',
   LOGIN: '/login',

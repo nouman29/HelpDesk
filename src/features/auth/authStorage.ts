@@ -1,10 +1,3 @@
-/**
- * Centralized token storage for the AI HelpDesk client.
- *
- * Backend currently has no logout endpoint, so "logout" simply means
- * dropping the token (and any related local state) and redirecting to login.
- */
-
 const TOKEN_KEY = 'hd:auth_token';
 const ACTIVE_CHAT_KEY = 'hd:active_chat_id';
 
@@ -36,7 +29,6 @@ export function isAuthenticated(): boolean {
   return Boolean(getToken());
 }
 
-/** Active chat id helpers — used by ChatPage to restore the in-progress chat. */
 export function saveActiveChatId(chatId: number): void {
   try {
     localStorage.setItem(ACTIVE_CHAT_KEY, String(chatId));
@@ -64,7 +56,6 @@ export function removeActiveChatId(): void {
   }
 }
 
-/** Convenience: full client-side logout (no backend endpoint exists yet). */
 export function clearAuth(): void {
   removeToken();
   removeActiveChatId();

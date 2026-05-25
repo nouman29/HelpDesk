@@ -1,15 +1,5 @@
 import type { DecisionStep } from "@/types";
 
-/**
- * The 5-step decision-journey skeleton. Currently consumed by
- * `ChatPage` as the fallback `totalSteps` when the backend hasn't yet
- * reported real progress.
- *
- * (The landing sections that used to render this — FeaturesSection,
- * ProblemSection, DomainsSection, ShowcaseSection, CTASection — have
- * been removed; their data-only exports (FEATURE_CARDS,
- * PROBLEM_POINTS, DOMAINS) were dropped with them.)
- */
 export const DECISION_JOURNEY: DecisionStep[] = [
   {
     id: "s1",

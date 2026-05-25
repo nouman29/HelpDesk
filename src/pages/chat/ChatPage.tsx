@@ -73,8 +73,6 @@ export default function ChatPage() {
   const [conclusions, setConclusions] = useState<Conclusion[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  /* ----------------------- Helpers ----------------------- */
-
   const pushAIQuestion = (text: string, options: string[], questionId: number) => {
     setMessages((m) => [
       ...m,
@@ -119,17 +117,6 @@ export default function ChatPage() {
     });
   };
 
-  /**
-   * Best-effort restore from /get-chat.
-   *
-   *  - Rehydrates the visible Q/A history.
-   *  - If the chat already carries `chat_conclusions`, jumps straight to the
-   *    `complete` phase and shows the conclusions list.
-   *  - Otherwise, points `currentQuestionId` at the first UNANSWERED question
-   *    (the next one the user needs to answer) and resumes `in-chat`.
-   *  - If the shape is unexpected we fail gracefully and the caller falls
-   *    back to a fresh flow.
-   */
   const tryRestoreFromGetChat = (
     resp: GetChatResponse,
     restoredChatId: number,
@@ -166,26 +153,18 @@ export default function ChatPage() {
       percentage: chatMeta.completion_percentage,
     });
 
-    // If the server already produced conclusions, treat the chat as complete.
     const restoredConclusions = Array.isArray(resp.chat_conclusions)
       ? resp.chat_conclusions
       : [];
     if (restoredConclusions.length > 0 || chatMeta.completion_percentage >= 100) {
       setConclusions(restoredConclusions);
       setPhase('complete');
-      // No further user action — clear the active id so the next session
-      // doesn't try to restore a finished chat.
       removeActiveChatId();
       return true;
     }
 
-    // Otherwise, find the FIRST unanswered question (this is the one the
-    // user must answer next). Per the spec: "if the chat is not concluded
-    // so there must be the last question must be not answered yet."
     const pending = items.find((i) => !i.selected_answer);
     if (!pending) {
-      // Every question is answered but completion < 100% and no conclusions
-      // — shape unexpected, fall back to a fresh flow.
       return false;
     }
     setCurrentQuestionId(pending.question_id);
@@ -202,8 +181,6 @@ export default function ChatPage() {
     return true;
   };
 
-  /* ----------------------- Bootstrapping ----------------------- */
-
   useEffect(() => {
     let cancelled = false;
 
@@ -213,7 +190,6 @@ export default function ChatPage() {
       const token = getToken();
       const existingChatId = getActiveChatId();
 
-      // 1) Try to restore an in-progress chat if we have one.
       if (token && existingChatId != null) {
         try {
           const restored = await apiGetChat(token, existingChatId);
@@ -222,15 +198,12 @@ export default function ChatPage() {
             setThinking(false);
             return;
           }
-          // Restoration was unclear — drop the stale id and start fresh.
           removeActiveChatId();
         } catch {
-          // Server refused or chat is gone — clear and fall through.
           removeActiveChatId();
         }
       }
 
-      // 2) Otherwise, fetch initial questions and ask the first one.
       try {
         const questions = await getInitialQuestions();
         if (cancelled) return;
@@ -259,9 +232,6 @@ export default function ChatPage() {
     };
   }, []);
 
-  /* ----------------------- Submission ----------------------- */
-
-  /** Unified handler used by BOTH option clicks and the free-text input. */
   const submitAnswer = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -291,7 +261,6 @@ export default function ChatPage() {
           setProgress((p) => (p ? { ...p, answered: nextAnswers.length } : p));
           pushAIQuestion(q.title, q.possible_answers, q.id);
         } else {
-          // All initial answers collected → call /start-chat
           const token = getToken();
           if (!token) throw new Error('You are not logged in.');
           setPhase('starting-chat');
@@ -310,10 +279,6 @@ export default function ChatPage() {
         if (!token) throw new Error('You are not logged in.');
         if (chatId == null) throw new Error('Missing chat id.');
 
-        // Decide which endpoint to call based on the LAST server-reported
-        // completion percentage. Per spec: once it crosses the threshold
-        // (e.g. > 90%), the next user submission goes to /conclude-chat
-        // rather than /send-answer.
         const currentPct = progress?.percentage ?? 0;
         const answer: AnswerPayload = { id: currentQuestionId, answer: trimmed };
 
@@ -333,9 +298,6 @@ export default function ChatPage() {
           if (resp.question && resp.question_id != null) {
             pushAIQuestion(resp.question, resp.possible_answers ?? [], resp.question_id);
           }
-          // Safety net: if the backend itself reports 100% we still
-          // wrap up gracefully even though we expected to conclude
-          // via the threshold branch above.
           if (resp.completion_percentage >= 100) {
             setPhase('complete');
             removeActiveChatId();
@@ -345,20 +307,15 @@ export default function ChatPage() {
       }
     } catch (err) {
       showErrorToast(err, 'chat');
-      // If we failed mid-conclude, drop back to in-chat so the user can retry.
       setPhase((p) => (p === 'concluding' ? 'in-chat' : p));
     } finally {
       setThinking(false);
     }
   };
 
-  /* ----------------------- Effects ----------------------- */
-
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, thinking, conclusions]);
-
-  /* ----------------------- New journey ----------------------- */
 
   const startNew = async () => {
     removeActiveChatId();
@@ -387,8 +344,6 @@ export default function ChatPage() {
     }
   };
 
-  /* ----------------------- Download report ----------------------- */
-
   const handleDownloadReport = async () => {
     const token = getToken();
     if (!token || chatId === null) return;
@@ -402,9 +357,6 @@ export default function ChatPage() {
     }
   };
 
-  /* ----------------------- Render ----------------------- */
-
-  // Find the latest AI message with unanswered options to render the option grid under.
   const latestOptionsMessageId = (() => {
     for (let i = messages.length - 1; i >= 0; i--) {
       const m = messages[i];
@@ -440,14 +392,12 @@ export default function ChatPage() {
     <motion.div variants={pageTransition} initial="initial" animate="enter" exit="exit">
       <BareLayout>
         <div className="grid h-screen overflow-hidden lg:grid-cols-[280px_1fr]">
-          {/* Desktop sidebar — not mounted on mobile (avoids duplicate SVG ids / API calls) */}
           {isLgUp && (
             <div className="min-h-0 h-screen" data-lenis-prevent>
               <Sidebar onNewJourney={startNew} />
             </div>
           )}
 
-          {/* Mobile sidebar drawer */}
           <AnimatePresence>
             {!isLgUp && sidebarOpen && (
               <>
@@ -490,12 +440,8 @@ export default function ChatPage() {
                   <MessageBubble key={m.id} message={m} index={i} />
                 ))}
 
-                {/* Options for the latest unanswered AI question */}
                 {latestOptionsMessageId && !thinking && phase !== 'complete' && phase !== 'concluding' && (
                   <div className="pl-11 -mt-1 relative">
-                    {/* Vertical connector: aligned with the AI avatar's
-                        center (16px), gradient that fades from brand blue
-                        to violet and into transparent. Decorative only. */}
                     <span
                       aria-hidden
                       className="pointer-events-none absolute left-4 -top-4 bottom-2 w-px rounded-full"

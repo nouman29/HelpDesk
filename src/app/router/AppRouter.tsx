@@ -12,10 +12,6 @@ const ChatPage        = lazy(() => import('@/pages/chat/ChatPage'));
 const RecentChatsPage = lazy(() => import('@/pages/chat/RecentChatsPage'));
 const NotFoundPage    = lazy(() => import('@/pages/NotFoundPage'));
 
-// Resets Lenis' internal scroll position on every route change so its
-// cached position can't desync from the browser's actual scroll (0).
-// Without this, navigating while scrolled partway down causes Lenis to
-// fight the browser and the page appears frozen.
 function LenisRouteSync() {
   const { pathname } = useLocation();
   useEffect(() => {

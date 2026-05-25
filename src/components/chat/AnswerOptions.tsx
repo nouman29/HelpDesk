@@ -8,11 +8,6 @@ interface Props {
   onSelect: (answer: string) => void;
 }
 
-/**
- * Renders backend `possible_answers` as a grid of selectable, glass-styled boxes.
- * Each option is its own clickable box that calls `onSelect(value)` with the
- * exact string.
- */
 export function AnswerOptions({ options, disabled = false, onSelect }: Props) {
   if (!options || options.length === 0) return null;
 

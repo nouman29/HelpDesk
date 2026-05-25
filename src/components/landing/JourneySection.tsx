@@ -14,8 +14,6 @@ import { SectionHeading } from '@/components/ui/SectionHeading';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { slideFromLeft, slideFromRight, stagger } from '@/utils/motion';
 
-/* ----------------------------- Data ----------------------------- */
-
 interface ProblemCard {
   icon: IconType;
   title: string;
@@ -66,13 +64,8 @@ const structuredSteps: { step: string; label: string; status: 'done' | 'active' 
   { step: '05', label: 'Recommendation: see a clinician now',  status: 'active' },
 ];
 
-/* --------------------------- Section ---------------------------- */
-
 export function JourneySection() {
   const ref = useRef<HTMLDivElement>(null);
-  // Scroll-driven animation: tie SVG line growth + a subtle parallax to the
-  // section's scroll position, the same pattern the previous JourneySection
-  // used.
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start end', 'end start'],
@@ -88,7 +81,6 @@ export function JourneySection() {
           subtitle="Modern AI tools give you conversations. What you actually need are conclusions."
         />
 
-        {/* Comparison columns with an animated connector between them */}
         <motion.div
           variants={stagger(0.12, 0.05)}
           initial="hidden"
@@ -96,7 +88,6 @@ export function JourneySection() {
           viewport={{ once: true, amount: 0.2 }}
           className="mt-20 grid lg:grid-cols-[1fr_96px_1fr] gap-6 lg:gap-4 items-stretch"
         >
-          {/* --- Traditional AI Chat (chaotic) --- */}
           <motion.div variants={slideFromLeft} className="h-full">
             <GlassCard
               hover
@@ -133,7 +124,6 @@ export function JourneySection() {
                 ))}
               </div>
 
-              {/* Bottom fade-out — softens the last bubble into the card bg */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-linear-to-t from-(--bg-1) via-(--bg-1)/60 to-transparent"
@@ -141,7 +131,6 @@ export function JourneySection() {
             </GlassCard>
           </motion.div>
 
-          {/* --- Animated connector (scroll-driven SVG) --- */}
           <motion.div
             variants={slideFromLeft}
             className="hidden lg:flex h-full items-stretch justify-center"
@@ -150,7 +139,6 @@ export function JourneySection() {
             <ScrollConnector lineLength={lineLength} />
           </motion.div>
 
-          {/* --- Help Desk AI (structured) --- */}
           <motion.div variants={slideFromRight} className="h-full">
             <GlassCard
               hover
@@ -187,7 +175,6 @@ export function JourneySection() {
                 ))}
               </div>
 
-              {/* Bottom fade-out — softens the last step into the card bg */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-2xl bg-linear-to-t from-(--bg-1) via-(--bg-1)/60 to-transparent"
@@ -196,7 +183,7 @@ export function JourneySection() {
           </motion.div>
         </motion.div>
 
-        {/* Problem cards grid — horizontal-row style */}
+
         <motion.div
           variants={stagger(0.08, 0.05)}
           initial="hidden"
@@ -238,20 +225,10 @@ export function JourneySection() {
   );
 }
 
-/* --------------------- Scroll connector SVG --------------------- */
-
 interface ScrollConnectorProps {
-  // MotionValue<number> from useTransform; left untyped to avoid importing
-  // the generic just for one prop. Framer accepts it directly via style.
   lineLength: ReturnType<typeof useTransform<number, number>>;
 }
 
-/**
- * Vertical animated bridge between the two comparison cards. The gradient
- * line "draws" itself as the section scrolls into view, and the decision
- * nodes pulse with staggered delays — the same motion language the
- * previous JourneySection used, repurposed as a divider.
- */
 function ScrollConnector({ lineLength }: ScrollConnectorProps) {
   return (
     <svg
@@ -263,7 +240,6 @@ function ScrollConnector({ lineLength }: ScrollConnectorProps) {
         <linearGradient id="journey-connector-grad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stopColor="#ff7ab8" stopOpacity="0.85" />
           <stop offset="45%"  stopColor="#8b6cff" />
-          {/* Fade out at the bottom end of the line */}
           <stop offset="85%"  stopColor="#3ee8ff" stopOpacity="1" />
           <stop offset="100%" stopColor="#3ee8ff" stopOpacity="0" />
         </linearGradient>
@@ -281,14 +257,12 @@ function ScrollConnector({ lineLength }: ScrollConnectorProps) {
         </filter>
       </defs>
 
-      {/* Track (static, subtle — also fades out at the bottom) */}
       <path
         d="M40 10 C 64 110, 16 200, 40 290 S 64 410, 40 510"
         stroke="url(#journey-connector-track)"
         strokeWidth="2"
         fill="none"
       />
-      {/* Animated path that grows with scroll progress and fades at the end */}
       <motion.path
         d="M40 10 C 64 110, 16 200, 40 290 S 64 410, 40 510"
         stroke="url(#journey-connector-grad)"
@@ -301,8 +275,6 @@ function ScrollConnector({ lineLength }: ScrollConnectorProps) {
     </svg>
   );
 }
-
-/* ------------------------- Subcomponents ------------------------- */
 
 function ChaosBubble({ who, text }: { who: 'you' | 'ai'; text: string }) {
   const isYou = who === 'you';

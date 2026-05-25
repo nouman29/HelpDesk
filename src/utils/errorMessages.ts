@@ -1,7 +1,3 @@
-/**
- * Maps raw API / validation messages to short, user-facing copy.
- */
-
 export type ErrorContext = 'auth' | 'chat' | 'general';
 
 const QUOTA_PATTERNS = [
@@ -22,7 +18,6 @@ export function isQuotaError(message: string, status?: number): boolean {
   return QUOTA_PATTERNS.some((p) => lower.includes(p));
 }
 
-/** Normalize backend / network text into a concise toast message. */
 export function toUserMessage(
   raw: string,
   context: ErrorContext = 'general',
