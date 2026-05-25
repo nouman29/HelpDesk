@@ -12,13 +12,11 @@ function resolveMessage(err: unknown, context: ErrorContext): string {
   return toUserMessage('', context);
 }
 
-/** Show a short error toast (deduped by message text). */
 export function showErrorToast(err: unknown, context: ErrorContext = 'general'): void {
   const message = resolveMessage(err, context);
   toast.error(message, { id: `err:${context}:${message}` });
 }
 
-/** Client-side validation messages (auth forms). */
 export function showValidationToast(message: string): void {
   toast.error(message, { id: `validation:${message}` });
 }

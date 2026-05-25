@@ -13,7 +13,6 @@ export function ChatInput({ onSend, thinking, disabled }: Props) {
   const baseTextRef = useRef('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea to fit content, capped at 160px then scrollable
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;

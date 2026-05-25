@@ -29,11 +29,6 @@ interface CircularProgressProps {
   active?: boolean;
 }
 
-/**
- * Small circular progress ring with the percentage centered inside.
- * Uses theme tokens + the existing brand gradient so it stays consistent
- * across dark and light themes.
- */
 function CircularProgress({ value, active = false }: CircularProgressProps) {
   const size = 34;
   const stroke = 3;
@@ -98,8 +93,6 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Highlight the chat that's currently active (either passed explicitly via
-  // prop, or read from the same localStorage key the ChatPage uses).
   const highlightedId = activeId ?? getActiveChatId();
 
   const fetchChats = useCallback(async (silent = false) => {
@@ -131,10 +124,6 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
   const openChat = (chatId: number) => {
     saveActiveChatId(chatId);
     if (location.pathname === ROUTES.CHAT) {
-      // Already on the chat route — force a re-bootstrap so ChatPage's
-      // /get-chat restore flow picks up the newly-active chat. The
-      // existing ChatPage effect runs only on mount; navigate() alone
-      // wouldn't remount it.
       window.location.reload();
     } else {
       navigate(ROUTES.CHAT);
@@ -177,9 +166,6 @@ export function Sidebar({ activeId, onNewJourney, className }: Props) {
         </span>
       </button>
 
-      {/* Theme-aware divider — uses the soft border token so it auto-flips
-          between dark and light themes (rgba(255,255,255,0.08) in dark,
-          rgba(10,20,40,0.08) in light). */}
       <hr className="border-0 h-px bg-(--border-soft) my-1" />
 
       <div className="flex items-center justify-between mt-2 px-1">

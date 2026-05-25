@@ -5,5 +5,3 @@ export const ROUTES = {
   CHAT: '/chat',
   RECENT_CHATS: '/recent-chats',
 } as const;
-
-export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

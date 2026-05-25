@@ -10,6 +10,7 @@ import { pageTransition, fadeUp, stagger } from '@/utils/motion';
 import { getMyChats, type MyChat } from '@/services/healthService';
 import { getToken, saveActiveChatId } from '@/features/auth/authStorage';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { ThemeToggle } from '@/features/theme/ThemeToggle';
 
 export default function RecentChatsPage() {
   const navigate = useNavigate();
@@ -76,7 +77,6 @@ export default function RecentChatsPage() {
             </div>
           )}
 
-          {/* Mobile sidebar drawer */}
           <AnimatePresence>
             {mobileSidebarOpen && (
               <>
@@ -110,7 +110,6 @@ export default function RecentChatsPage() {
             className="flex flex-col min-w-0 min-h-0 h-screen overflow-y-auto overscroll-contain scroll-thin"
             data-lenis-prevent
           >
-            {/* Header */}
             <header className="sticky top-0 z-20 glass-strong border-b border-white/5 px-4 md:px-6 py-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <button
@@ -129,10 +128,10 @@ export default function RecentChatsPage() {
                   <h1 className="text-base md:text-lg font-semibold text-primary">Recent Chats</h1>
                 </div>
               </div>
+              <ThemeToggle />
             </header>
 
             <div className="mx-auto w-full max-w-5xl px-6 py-10 flex flex-col gap-10">
-              {/* Hero / search */}
               <motion.section
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -165,7 +164,6 @@ export default function RecentChatsPage() {
                 </div>
               </motion.section>
 
-              {/* States */}
               {loading ? (
                 <div className="rounded-2xl glass border border-white/10 py-20 text-center text-tertiary">
                   <span className="inline-flex items-center gap-1.5">
@@ -248,7 +246,6 @@ export default function RecentChatsPage() {
                                     {c.total_answered_questions} of {c.total_questions} questions answered
                                   </p>
 
-                                  {/* Progress bar */}
                                   <div className="mt-3 h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
                                     <div
                                       className="h-full rounded-full bg-linear-to-r from-[#1f86ff] to-[#8b6cff] transition-all duration-500"

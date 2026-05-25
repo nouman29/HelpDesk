@@ -32,7 +32,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-36 ">
+    <section data-theme="dark" className="relative min-h-screen w-full overflow-hidden flex items-center justify-center pt-36 isolate">
       
       {bgReady && (
         <HeroBackground className="absolute inset-0 -z-30 pointer-events-none" />

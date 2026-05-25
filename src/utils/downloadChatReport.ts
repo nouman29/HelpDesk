@@ -178,12 +178,9 @@ export async function downloadChatReport({
     minute: '2-digit',
   });
 
-  const chatMeta = data.chat;
   const questions = Array.isArray(data.chat_questions)
     ? data.chat_questions
     : [];
-
-  const pct = Math.round(chatMeta.completion_percentage ?? 0);
 
   drawPageHeader(doc, pageW);
 
@@ -198,16 +195,10 @@ export async function downloadChatReport({
   drawGradientLine(doc, MARGIN, y, 74, 1);
   y += 10;
 
-  doc.setFont('courier', 'bold');
-  doc.setFontSize(7.5);
-  doc.setTextColor(...TEXT_3);
-  doc.text('// SUMMARY', MARGIN, y);
-  y += 5;
-
   const cardX = MARGIN;
   const cardY = y;
   const cardW = bodyW;
-  const cardH = 46;
+  const cardH = 22;
 
   doc.setFillColor(...BRAND_50);
   doc.roundedRect(cardX, cardY, cardW, cardH, 3, 3, 'F');
@@ -216,41 +207,17 @@ export async function downloadChatReport({
   doc.roundedRect(cardX, cardY, 3.5, cardH, 1.7, 1.7, 'F');
 
   const col1X = cardX + 9;
-  const col2X = cardX + cardW / 2 + 2;
   const row1Y = cardY + 9;
-  const row2Y = row1Y + 13;
-  const row3Y = row2Y + 13;
 
-  function summaryItem(label: string, value: string, cx: number, cy: number) {
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(...TEXT_3);
-    doc.text(label.toUpperCase(), cx, cy);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...TEXT_3);
+  doc.text('GENERATED ON', col1X, row1Y);
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(...BRAND_900);
-    doc.text(value, cx, cy + 4.5);
-  }
-
-  summaryItem('Chat ID', `#${chatId}`, col1X, row1Y);
-  summaryItem('Completion', `${pct}%`, col2X, row1Y);
-
-  summaryItem(
-    'Total Questions',
-    String(chatMeta.total_questions_asked ?? 0),
-    col1X,
-    row2Y,
-  );
-
-  summaryItem(
-    'Questions Answered',
-    String(chatMeta.total_questions_answered ?? 0),
-    col2X,
-    row2Y,
-  );
-
-  summaryItem('Generated On', generatedAt, col1X, row3Y);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...BRAND_900);
+  doc.text(generatedAt, col1X, row1Y + 4.5);
 
   y = cardY + cardH + 14;
 

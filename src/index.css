@@ -63,6 +63,27 @@
            radial-gradient(800px 600px at 50% 100%, rgba(62,232,255,0.12), transparent 60%);
 }
 
+/* Force dark-mode tokens inside any element marked [data-theme="dark"],
+   even when the root carries the .light class. */
+:root.light [data-theme="dark"] {
+  --bg-0:   #05070b;
+  --bg-1:   #080b12;
+  --bg-2:   #0b1018;
+  --bg-3:   #10172150;
+  --surface-glass: rgba(255, 255, 255, 0.04);
+  --surface-glass-strong: rgba(255, 255, 255, 0.08);
+  --border-soft:  rgba(255, 255, 255, 0.08);
+  --border-glow:  rgba(120, 170, 255, 0.25);
+  --text-1:   #f5f8ff;
+  --text-2:   #b8c4d9;
+  --text-3:   #7a8aa6;
+  --shadow-glow: 0 0 60px -10px rgba(74, 166, 255, 0.45);
+  --nav-separator: rgba(255, 255, 255, 0.9);
+  background-color: #05070b;
+  color: #f5f8ff;
+  color-scheme: dark;
+}
+
 /* Base */
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
@@ -233,6 +254,11 @@ body {
 }
 :root.light .text-gradient {
   background: linear-gradient(120deg, #0a1530 0%, #0a52b8 40%, #5b3dd8 70%, #0a66e6 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+:root.light [data-theme="dark"] .text-gradient {
+  background: linear-gradient(120deg, #ffffff 0%, #b5dcff 35%, #8b6cff 70%, #3ee8ff 100%);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; color: transparent;
 }

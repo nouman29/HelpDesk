@@ -1,22 +1,29 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-type SpeechRecognitionInstance = InstanceType<typeof window.SpeechRecognition>;
+interface SR {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  continuous: boolean;
+  onstart: ((ev: Event) => void) | null;
+  onresult: ((ev: SpeechRecognitionEvent) => void) | null;
+  onend: ((ev: Event) => void) | null;
+  onerror: ((ev: SpeechRecognitionErrorEvent) => void) | null;
+  start(): void;
+  stop(): void;
+}
+type SRCtor = { new(): SR };
 
-function getSpeechRecognition(): typeof window.SpeechRecognition | null {
+function getSpeechRecognition(): SRCtor | null {
   if (typeof window === 'undefined') return null;
-  return (
-    window.SpeechRecognition ??
-    (window as unknown as { webkitSpeechRecognition?: typeof window.SpeechRecognition })
-      .webkitSpeechRecognition ??
-    null
-  );
+  const w = window as unknown as { SpeechRecognition?: SRCtor; webkitSpeechRecognition?: SRCtor };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
 export function useSpeechRecognition(onTranscript: (text: string) => void) {
   const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const recognitionRef = useRef<SR | null>(null);
   const finalTranscriptRef = useRef('');
-  // Tracks whether stop() was called intentionally so onend doesn't restart
   const stoppedIntentionallyRef = useRef(false);
   const isSupported = !!getSpeechRecognition();
 
@@ -36,13 +43,11 @@ export function useSpeechRecognition(onTranscript: (text: string) => void) {
     recognition.lang = 'en-US';
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
-    // continuous = true keeps listening through natural speech pauses
     recognition.continuous = true;
 
     recognition.onstart = () => setIsListening(true);
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      // Ignore any buffered results that arrive after intentional stop
       if (stoppedIntentionallyRef.current) return;
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -57,13 +62,11 @@ export function useSpeechRecognition(onTranscript: (text: string) => void) {
     };
 
     recognition.onend = () => {
-      // If stopped intentionally, fully close out
       if (stoppedIntentionallyRef.current) {
         setIsListening(false);
         recognitionRef.current = null;
         return;
       }
-      // Otherwise the browser ended due to a pause — restart to keep listening
       try {
         recognition.start();
       } catch {
@@ -81,7 +84,6 @@ export function useSpeechRecognition(onTranscript: (text: string) => void) {
           toast.error('Microphone access denied. Please allow it in your browser settings.');
         });
       }
-      // 'no-speech' and 'aborted' are expected during continuous mode — ignore them
     };
 
     recognitionRef.current = recognition;
